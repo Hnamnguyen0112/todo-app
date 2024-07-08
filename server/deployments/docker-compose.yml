@@ -1,0 +1,18 @@
+version: "3.8"
+name: todoapp
+services:
+  redis:
+    image: redis/redis-stack:latest
+    restart: always
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  postgres:
+    image: postgres:16.2
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=todoapp
+    ports:
+      - "5432:5432"
