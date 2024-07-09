@@ -32,3 +32,9 @@ func Connect() {
 		fmt.Println("redis err: ", err)
 	}
 }
+
+func Disconnect() {
+	if err := RDB.Close(); err != nil {
+		fmt.Println("redis err: ", err)
+	}
+}

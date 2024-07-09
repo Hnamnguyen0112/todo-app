@@ -2,6 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -19,6 +25,8 @@ import (
 
 var ctx = context.Background()
 
+const idleTimeout = 5 * time.Second
+
 func main() {
 	database.Connect()
 	redis.Connect()
@@ -30,6 +38,7 @@ func main() {
 		ReadBufferSize: 4096 * 2,
 		ErrorHandler:   middlewares.ErrorHandlerMiddleware,
 		Prefork:        true,
+		IdleTimeout:    idleTimeout,
 	})
 
 	app.Use(logger.New())
@@ -53,5 +62,26 @@ func main() {
 
 	routes.AuthRouter(v1.Group("/auth"), h)
 
-	app.Listen(":3000")
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		if err := app.Listen(":3000"); err != nil {
+			log.Fatalf("Failed to start Fiber app: %v", err)
+		}
+	}()
+
+	sig := <-quit
+	log.Printf("Received %s signal. Shutting down server with PID: %d", sig, os.Getpid())
+
+	if err := app.Shutdown(); err != nil {
+		log.Fatalf("Failed to shutdown server: %v", err)
+	}
+
+	fmt.Println("Running cleanup tasks...")
+
+	database.Disconnect()
+	redis.Disconnect()
+
+	log.Printf("Server with PID: %d gracefully stopped", os.Getpid())
 }

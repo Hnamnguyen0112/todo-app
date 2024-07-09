@@ -64,3 +64,12 @@ func Connect() {
 		&entities.User{},
 	)
 }
+
+func Disconnect() {
+	sqlDB, err := DB.DB()
+	if err != nil {
+		fmt.Println("database err: ", err)
+	}
+
+	sqlDB.Close()
+}
