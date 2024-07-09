@@ -1,7 +1,6 @@
 package token
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -24,7 +23,6 @@ func NewService() Service {
 	return &TokenService{}
 }
 
-// param: user
 func (s *TokenService) GenerateToken(u *entities.User) (string, error) {
 	jwtSecret := config.Config("JWT_SECRET")
 	jwtExpStr := config.Config("JWT_EXPIRATION")
@@ -33,13 +31,11 @@ func (s *TokenService) GenerateToken(u *entities.User) (string, error) {
 		return "", err
 	}
 
-	fmt.Println(jwtSecret)
-
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": u.ID,
 		"exp": time.Now().Add(time.Second * time.Duration(jwtExp)).Unix(),
 		"iat": time.Now().Unix(),
-		"iss": "todo-app",
+		"iss": config.Config("JWT_ISSUER"),
 		"aud": "todo-app",
 	})
 
@@ -58,7 +54,7 @@ func (s *TokenService) GenerateRefreshToken(u *entities.User) (string, error) {
 		"sub": u.ID,
 		"exp": time.Now().Add(time.Second * time.Duration(jwtExp)).Unix(),
 		"iat": time.Now().Unix(),
-		"iss": "todo-app",
+		"iss": config.Config("JWT_ISSUER"),
 		"aud": "todo-app",
 	})
 

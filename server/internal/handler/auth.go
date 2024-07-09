@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/Hnamnguyen0112/todo-app/server/internal/presenter"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/entities"
@@ -71,6 +72,11 @@ func (h *Handler) SignUp(c *fiber.Ctx) error {
 }
 
 func (h *Handler) SignOut(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["sub"].(string)
+
+	c.Locals("data", userId)
 	return c.SendStatus(fiber.StatusOK)
 }
 
