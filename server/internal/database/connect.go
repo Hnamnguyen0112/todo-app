@@ -62,6 +62,10 @@ func Connect() {
 
 	DB.AutoMigrate(
 		&entities.User{},
+		&entities.Project{},
+		&entities.Invitation{},
+		&entities.Column{},
+		&entities.Task{},
 	)
 }
 

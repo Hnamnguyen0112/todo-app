@@ -10,11 +10,13 @@ import (
 
 type User struct {
 	gorm.Model
-	ID       uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()"`
-	Username string    `gorm:"uniqueIndex;not null;size:50;"        validate:"required,min=3,max=50" json:"username"`
-	Email    string    `gorm:"uniqueIndex;not null;size:255;"       validate:"required,email"        json:"email"`
-	Password string    `gorm:"not null;"                            validate:"required,min=6,max=50" json:"password"`
-	Names    string    `                                                                             json:"names"`
+	ID          uuid.UUID    `gorm:"type:uuid;default:uuid_generate_v4()"`
+	Username    string       `gorm:"uniqueIndex;not null;size:50;"        validate:"required,min=3,max=50" json:"username"`
+	Email       string       `gorm:"uniqueIndex;not null;size:255;"       validate:"required,email"        json:"email"`
+	Password    string       `gorm:"not null;"                            validate:"required,min=6,max=50" json:"password"`
+	Names       string       `gorm:"not null;"                            validate:"required,min=6,max=50" json:"names"`
+	Invitations []Invitation `gorm:"foreignKey:UserID"`
+	Tasks       []Task       `gorm:"foreignKey:AssigneeID"`
 }
 
 func (u *User) HashPassword(plain string) (string, error) {
