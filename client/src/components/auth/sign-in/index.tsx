@@ -1,12 +1,22 @@
 import Image from "next/image";
 import { FcGoogle } from "@react-icons/all-files/fc/FcGoogle";
 import { FaGithub } from "@react-icons/all-files/fa/FaGithub";
+import { motion } from "framer-motion";
 
-export default function AuthPage() {
+interface SignInProps {
+  handleRedirectSignUp: () => void;
+}
+
+export default function SignIn({ handleRedirectSignUp }: SignInProps) {
   return (
-    <>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      exit={{ opacity: 0 }}
+    >
       <Image
-        src="/vercel.svg"
+        src="/images/vercel.svg"
         alt="Vercel Logo"
         className="dark:invert mb-8"
         width={100}
@@ -19,17 +29,25 @@ export default function AuthPage() {
 
       <p className="text-sm mb-10">
         <span className="text-gray-600 font-light">Not a member?</span>&nbsp;
-        <button className="text-gray-800 font-bold">Sign up</button>
+        <button
+          type="button"
+          onClick={handleRedirectSignUp}
+          className="text-gray-800 font-bold"
+        >
+          Sign up
+        </button>
       </p>
 
       <div className="mb-6">
         <label className="block text-gray-700 text-sm font-semibold mb-2">
-          Email Address
+          Email / Username
         </label>
         <input
           className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
           type="email"
-          placeholder="Email Address"
+          placeholder="Email / Username"
+          name="identity"
+          id="identity"
         />
       </div>
       <div className="mb-4">
@@ -45,6 +63,8 @@ export default function AuthPage() {
           className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
           type="password"
           placeholder="Password"
+          name="password"
+          id="password"
         />
       </div>
       <div className="mb-8">
@@ -71,6 +91,6 @@ export default function AuthPage() {
           Github
         </button>
       </div>
-    </>
+    </motion.div>
   );
 }
