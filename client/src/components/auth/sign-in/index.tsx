@@ -2,18 +2,49 @@ import Image from "next/image";
 import { FcGoogle } from "@react-icons/all-files/fc/FcGoogle";
 import { FaGithub } from "@react-icons/all-files/fa/FaGithub";
 import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoginSchema } from "@/schemas/auth";
+import { useTransition } from "react";
+import { login } from "@/actions/login";
+import { z } from "zod";
 
 interface SignInProps {
   handleRedirectSignUp: () => void;
 }
 
 export default function SignIn({ handleRedirectSignUp }: SignInProps) {
+  const [isPending, startTransition] = useTransition();
+  const {
+    handleSubmit,
+    formState: { errors },
+    reset,
+    register,
+  } = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      identity: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    startTransition(() => {
+      login(values).then((data) => {
+        if (data?.error) {
+          reset();
+        }
+      });
+    });
+  };
+
   return (
-    <motion.div
+    <motion.form
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
       exit={{ opacity: 0 }}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <Image
         src="/images/vercel.svg"
@@ -46,8 +77,7 @@ export default function SignIn({ handleRedirectSignUp }: SignInProps) {
           className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
           type="email"
           placeholder="Email / Username"
-          name="identity"
-          id="identity"
+          {...register("identity")}
         />
       </div>
       <div className="mb-4">
@@ -63,12 +93,14 @@ export default function SignIn({ handleRedirectSignUp }: SignInProps) {
           className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
           type="password"
           placeholder="Password"
-          name="password"
-          id="password"
+          {...register("password")}
         />
       </div>
       <div className="mb-8">
-        <button className="bg-gray-700 text-white font-normal py-2 px-4 w-full rounded hover:bg-gray-600">
+        <button
+          className="bg-gray-700 text-white font-normal py-2 px-4 w-full rounded hover:bg-gray-600"
+          type="submit"
+        >
           Sign In
         </button>
       </div>
@@ -91,6 +123,6 @@ export default function SignIn({ handleRedirectSignUp }: SignInProps) {
           Github
         </button>
       </div>
-    </motion.div>
+    </motion.form>
   );
 }
