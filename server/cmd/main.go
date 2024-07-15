@@ -15,6 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 
 	"github.com/Hnamnguyen0112/todo-app/server/internal/database"
+	"github.com/Hnamnguyen0112/todo-app/server/internal/eventstore"
 	"github.com/Hnamnguyen0112/todo-app/server/internal/handler"
 	"github.com/Hnamnguyen0112/todo-app/server/internal/redis"
 	"github.com/Hnamnguyen0112/todo-app/server/internal/routes"
@@ -29,6 +30,7 @@ const idleTimeout = 5 * time.Second
 
 func main() {
 	database.Connect()
+	eventstore.Connect()
 	redis.Connect()
 
 	us := user.NewService()
@@ -82,6 +84,7 @@ func main() {
 
 	database.Disconnect()
 	redis.Disconnect()
+	eventstore.Disconnect()
 
 	log.Printf("Server with PID: %d gracefully stopped", os.Getpid())
 }
