@@ -1,16 +1,16 @@
 "use server";
 
 import { CommonResponse } from "@/interfaces/common";
-import { signIn } from "@/libs/auth";
-import { LoginSchema } from "@/schemas/auth";
+import { signIn as nextAuthSignIn } from "@/libs/auth";
+import { SignInSchema } from "@/schemas/auth";
 import { AuthError } from "next-auth";
 import { z } from "zod";
 
-export async function login(
-  values: z.infer<typeof LoginSchema>,
+export async function signIn(
+  values: z.infer<typeof SignInSchema>,
   callbackUrl?: string | null,
 ): Promise<CommonResponse<null, null>> {
-  const validatedFields = LoginSchema.safeParse(values);
+  const validatedFields = SignInSchema.safeParse(values);
 
   if (!validatedFields.success) {
     throw new Error("Invalid fields");
@@ -19,7 +19,7 @@ export async function login(
   const { identity, password } = validatedFields.data;
 
   try {
-    await signIn("credentials", {
+    await nextAuthSignIn("credentials", {
       identity,
       password,
       redirectTo: callbackUrl || "/",

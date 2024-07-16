@@ -4,4 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var EventStore *mongo.Client
+var (
+	EventStore      *mongo.Client
+	EventCollection *mongo.Collection
+)

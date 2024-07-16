@@ -42,6 +42,8 @@ func Connect() {
 	if err != nil {
 		fmt.Println("eventstore err: ", err)
 	}
+
+	EventCollection = EventStore.Database(eventstoreDatabase).Collection("events")
 }
 
 func Disconnect() {

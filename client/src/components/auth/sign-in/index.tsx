@@ -4,10 +4,11 @@ import { FaGithub } from "@react-icons/all-files/fa/FaGithub";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginSchema } from "@/schemas/auth";
+import { SignInSchema } from "@/schemas/auth";
 import { useTransition } from "react";
-import { login } from "@/actions/login";
+import { signIn } from "@/actions/sign-in";
 import { z } from "zod";
+import toast from "@/components/toast";
 
 interface SignInProps {
   handleRedirectSignUp: () => void;
@@ -15,23 +16,24 @@ interface SignInProps {
 
 export default function SignIn({ handleRedirectSignUp }: SignInProps) {
   const [isPending, startTransition] = useTransition();
-  const {
-    handleSubmit,
-    formState: { errors },
-    reset,
-    register,
-  } = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
+  const { handleSubmit, reset, register } = useForm<
+    z.infer<typeof SignInSchema>
+  >({
+    resolver: zodResolver(SignInSchema),
     defaultValues: {
       identity: "",
       password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+  const onSubmit = (values: z.infer<typeof SignInSchema>) => {
     startTransition(() => {
-      login(values).then((data) => {
+      signIn(values).then((data) => {
         if (data?.error) {
+          toast({
+            type: "error",
+            message: data.error,
+          });
           reset();
         }
       });
@@ -78,6 +80,7 @@ export default function SignIn({ handleRedirectSignUp }: SignInProps) {
           type="email"
           placeholder="Email / Username"
           {...register("identity")}
+          disabled={isPending}
         />
       </div>
       <div className="mb-4">
@@ -94,12 +97,14 @@ export default function SignIn({ handleRedirectSignUp }: SignInProps) {
           type="password"
           placeholder="Password"
           {...register("password")}
+          disabled={isPending}
         />
       </div>
       <div className="mb-8">
         <button
           className="bg-gray-700 text-white font-normal py-2 px-4 w-full rounded hover:bg-gray-600"
           type="submit"
+          disabled={isPending}
         >
           Sign In
         </button>
