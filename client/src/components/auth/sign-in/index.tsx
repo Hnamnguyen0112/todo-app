@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignInSchema } from "@/schemas/auth";
 import { useTransition } from "react";
-import { signIn } from "@/actions/sign-in";
+import signIn from "@/actions/sign-in";
 import { z } from "zod";
 import toast from "@/components/toast";
 

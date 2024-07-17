@@ -6,7 +6,7 @@ import { SignInSchema } from "@/schemas/auth";
 import { AuthError } from "next-auth";
 import { z } from "zod";
 
-export async function signIn(
+export default async function signIn(
   values: z.infer<typeof SignInSchema>,
   callbackUrl?: string | null,
 ): Promise<CommonResponse<null, null>> {

@@ -1,5 +1,6 @@
 "use client";
 
+import LayoutProvider from "@/components/providers/LayoutProvider";
 import { NextUIProvider } from "@nextui-org/react";
 import { SessionProvider } from "next-auth/react";
 import { ToastContainer } from "react-toastify";
@@ -10,8 +11,10 @@ export default function Providers({
   return (
     <SessionProvider>
       <NextUIProvider>
-        {children}
-        <ToastContainer />
+        <LayoutProvider>
+          {children}
+          <ToastContainer />
+        </LayoutProvider>
       </NextUIProvider>
     </SessionProvider>
   );
