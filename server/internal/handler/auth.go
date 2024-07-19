@@ -42,16 +42,16 @@ func (h *Handler) SignIn(c *fiber.Ctx) error {
 		)
 	}
 
-	token, err := h.tokenService.GenerateToken(user)
+	access, accessExp, err := h.tokenService.GenerateToken(user)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
-	refresh, err := h.tokenService.GenerateRefreshToken(user)
+	refresh, refreshExp, err := h.tokenService.GenerateRefreshToken(user)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	c.Locals("data", presenter.SignInSuccessResponse(user, token, refresh))
+	c.Locals("data", presenter.SignInSuccessResponse(user, access, refresh, accessExp, refreshExp))
 	return c.SendStatus(fiber.StatusOK)
 }
 

@@ -15,8 +15,8 @@ type User struct {
 	Email       string       `gorm:"uniqueIndex;not null;size:255;"       validate:"required,email"        json:"email"`
 	Password    string       `gorm:"not null;"                            validate:"required,min=6,max=50" json:"password"`
 	Names       string       `gorm:"not null;"                            validate:"required,min=6,max=50" json:"names"`
-	Invitations []Invitation `gorm:"foreignKey:UserID"`
-	Tasks       []Task       `gorm:"foreignKey:AssigneeID"`
+	Invitations []Invitation `gorm:"foreignKey:UserID"                                                     json:"invitations"`
+	Tasks       []Task       `gorm:"foreignKey:AssigneeID"                                                 json:"tasks"`
 }
 
 func (u *User) HashPassword(plain string) (string, error) {

@@ -14,7 +14,13 @@ func SignUpSuccessResponse(u *entities.User) map[string]interface{} {
 	}
 }
 
-func SignInSuccessResponse(u *entities.User, token string, refresh string) map[string]interface{} {
+func SignInSuccessResponse(
+	u *entities.User,
+	access string,
+	refresh string,
+	accessExp int64,
+	refreshExp int64,
+) map[string]interface{} {
 	return map[string]interface{}{
 		"user": map[string]interface{}{
 			"id":        u.ID,
@@ -25,7 +31,9 @@ func SignInSuccessResponse(u *entities.User, token string, refresh string) map[s
 			"updatedAt": u.UpdatedAt,
 			"deletedAt": u.DeletedAt,
 		},
-		"token":   token,
-		"refresh": refresh,
+		"access":     access,
+		"refresh":    refresh,
+		"accessExp":  accessExp,
+		"refreshExp": refreshExp,
 	}
 }

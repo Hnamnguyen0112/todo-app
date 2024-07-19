@@ -2,9 +2,14 @@ import {
   useLayout,
   useLayoutActions,
 } from "@/components/providers/LayoutProvider";
-import { HomeIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  ClipboardDocumentIcon,
+  HomeIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 const Sidebar = () => {
   const { toggleSidebar } = useLayout();
@@ -37,13 +42,22 @@ const Sidebar = () => {
       <nav className="flex-1 overflow-hidden hover:overflow-y-auto">
         <ul className="p-2 overflow-hidden">
           <li>
-            <a
-              href="#"
-              className="flex items-center p-2 space-x-2 rounded-md hover:bg-gray-100"
+            <Link
+              href="/your-work"
+              className="flex items-center p-2 space-x-2 rounded-md hover:bg-gray-100 text-sm"
             >
               <HomeIcon className="w-6 h-6 text-gray-500" />
-              <span>Dashboard</span>
-            </a>
+              <span>Your work</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/status-updates"
+              className="flex items-center p-2 space-x-2 rounded-md hover:bg-gray-100 text-sm"
+            >
+              <ClipboardDocumentIcon className="w-6 h-6 text-gray-500" />
+              <span>Status updates</span>
+            </Link>
           </li>
         </ul>
       </nav>
