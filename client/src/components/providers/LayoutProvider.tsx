@@ -29,7 +29,7 @@ interface LayoutProviderProps {
 }
 
 export default function LayoutProvider({ children }: LayoutProviderProps) {
-  const [toggleSidebar, setToggleSidebar] = useState(true);
+  const [toggleSidebar, setToggleSidebar] = useState(false);
   return (
     <LayoutContext.Provider
       value={{

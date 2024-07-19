@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   useLayout,
   useLayoutActions,
@@ -8,28 +9,38 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useWindowSize } from "@uidotdev/usehooks";
 import Link from "next/link";
 
 const Sidebar = () => {
   const { toggleSidebar } = useLayout();
   const { setToggleSidebar } = useLayoutActions();
 
+  const size = useWindowSize();
+
   return (
     <motion.aside
-      initial={{ width: "0px", x: -256 }}
       animate={{
-        width: toggleSidebar ? "256px" : "0px",
-        x: toggleSidebar ? 0 : -256,
+        width: toggleSidebar
+          ? "256px"
+          : size.width != null && size.width > 1024
+            ? "64px"
+            : "0",
       }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.1 }}
       className={clsx(
         "text-black fixed inset-y-0 z-10 flex flex-col flex-shrink-0 w-64 max-h-screen overflow-hidden transition-all transform bg-white border-r shadow-lg lg:z-auto lg:static lg:shadow-none",
       )}
     >
       <div className="flex items-center justify-between flex-shrink-0 p-2">
         <span className="p-2 text-xl font-semibold leading-8 tracking-wider uppercase whitespace-nowrap">
-          K<span>-WD</span>
+          <Image
+            src="https://avatars0.githubusercontent.com/u/57622665"
+            alt="Vercel"
+            width={30}
+            height={30}
+          />
         </span>
         <button
           className="p-2 rounded-md lg:hidden"
@@ -46,8 +57,26 @@ const Sidebar = () => {
               href="/your-work"
               className="flex items-center p-2 space-x-2 rounded-md hover:bg-gray-100 text-sm"
             >
-              <HomeIcon className="w-6 h-6 text-gray-500" />
-              <span>Your work</span>
+              <HomeIcon
+                className={clsx(
+                  !toggleSidebar && "m-auto",
+                  "w-6 h-6 text-gray-500",
+                )}
+              />
+              <AnimatePresence>
+                {toggleSidebar && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{
+                      opacity: 1,
+                      transition: { duration: 1, delay: 0.2 },
+                    }}
+                    exit={{ opacity: 0, transition: { duration: 0 } }}
+                  >
+                    Your work
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </Link>
           </li>
           <li>
@@ -55,8 +84,26 @@ const Sidebar = () => {
               href="/status-updates"
               className="flex items-center p-2 space-x-2 rounded-md hover:bg-gray-100 text-sm"
             >
-              <ClipboardDocumentIcon className="w-6 h-6 text-gray-500" />
-              <span>Status updates</span>
+              <ClipboardDocumentIcon
+                className={clsx(
+                  !toggleSidebar && "m-auto",
+                  "w-6 h-6 text-gray-500",
+                )}
+              />
+              <AnimatePresence>
+                {toggleSidebar && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{
+                      opacity: 1,
+                      transition: { duration: 1, delay: 0.2 },
+                    }}
+                    exit={{ opacity: 0, transition: { duration: 0 } }}
+                  >
+                    Status updates
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </Link>
           </li>
         </ul>

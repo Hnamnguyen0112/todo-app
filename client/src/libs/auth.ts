@@ -1,11 +1,11 @@
 import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import { http } from "./http";
 import { HTTPError } from "ky";
 import { LoginResponse } from "@/interfaces/auth";
 import { CommonResponse } from "@/interfaces/common";
 import dayjs from "dayjs";
+import { Env } from "./env";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
@@ -22,21 +22,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         let user = null;
 
         try {
-          const response = (await http
-            .post("auth/signin", {
-              json: credentials,
-            })
-            .json()) as CommonResponse<LoginResponse, null>;
-
-          if (response.data) {
-            user = response.data;
-
-            http.extend({
-              headers: {
-                Authorization: `Bearer ${user.access}`,
-              },
-            });
-          }
+          await fetch(`${Env.BACKEND_URL}/api/v1/auth/signin`, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              identity: credentials.identity,
+              password: credentials.password,
+            }),
+            method: "POST",
+          }).then(async (res) => {
+            if (res.ok) {
+              const json = (await res.json()) as CommonResponse<
+                LoginResponse,
+                null
+              >;
+              user = json.data;
+            }
+          });
 
           return user;
         } catch (error) {
@@ -53,15 +56,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     authorized: async ({ auth }) => {
-      if (!auth) {
-        http.extend({
-          headers: {
-            Authorization: "",
-          },
-        });
-        return false;
-      }
-
       if (dayjs(auth?.expires).isBefore(dayjs())) {
         return false;
       }
@@ -86,6 +80,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.email = token.user.email;
       session.user.name = token.user.names;
       session.expires = dayjs.unix(token.accessExp).toISOString() as any;
+      session.sessionToken = token.access;
 
       return session;
     },

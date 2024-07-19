@@ -1,6 +1,6 @@
 "use server";
 
-import { http } from "@/libs/http";
+import { Env } from "@/libs/env";
 import { SignUpSchema } from "@/schemas/auth";
 import { z } from "zod";
 
@@ -12,13 +12,17 @@ export default async function signUp(values: z.infer<typeof SignUpSchema>) {
   }
 
   try {
-    const response = await http
-      .post("auth/signup", {
-        json: validatedFields.data,
-      })
-      .json();
-
-    return response;
+    return fetch(`${Env.BACKEND_URL}/api/v1/auth/signup`, {
+      body: JSON.stringify(validatedFields.data),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+    });
   } catch (error) {
     throw error;
   }

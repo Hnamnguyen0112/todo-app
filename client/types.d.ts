@@ -28,6 +28,7 @@ declare module "next-auth" {
    * Returned by `useSession`, `auth`, contains information about the active session.
    */
   interface Session {
+    sessionToken: string;
     error?: "RefreshAccessTokenError";
   }
 }
