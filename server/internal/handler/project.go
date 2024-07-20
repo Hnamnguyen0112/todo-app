@@ -7,6 +7,7 @@ import (
 
 	"github.com/Hnamnguyen0112/todo-app/server/internal/presenter"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/entities"
+	"github.com/Hnamnguyen0112/todo-app/server/pkg/pagination"
 )
 
 func (h *Handler) GetProjectList(c *fiber.Ctx) error {
@@ -14,17 +15,27 @@ func (h *Handler) GetProjectList(c *fiber.Ctx) error {
 	claims := user.Claims.(jwt.MapClaims)
 	userIdString := claims["sub"].(string)
 
+	req := &pagination.PaginationRequest{}
+
+	if err := req.Bind(c); err != nil {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
+	}
+
 	userId, err := uuid.Parse(userIdString)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	projects, err := h.projectService.GetProjectListByUserId(userId)
+	projects, meta, err := h.projectService.GetProjectListByUserId(
+		userId,
+		req,
+	)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	c.Locals("data", projects)
+	c.Locals("meta", meta)
 	return c.SendStatus(fiber.StatusOK)
 }
 

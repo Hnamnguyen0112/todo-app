@@ -6,3 +6,14 @@ export interface CommonResponse<T, M> {
   code: number;
   success: boolean;
 }
+
+export interface PaginationRequest {
+  page: number;
+  limit: number;
+  keyword: string;
+}
+
+export interface PaginationMeta {
+  total: number;
+  totalPages: number;
+}

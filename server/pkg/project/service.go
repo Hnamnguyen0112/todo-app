@@ -5,10 +5,14 @@ import (
 
 	"github.com/Hnamnguyen0112/todo-app/server/internal/database"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/entities"
+	"github.com/Hnamnguyen0112/todo-app/server/pkg/pagination"
 )
 
 type Service interface {
-	GetProjectListByUserId(userId uuid.UUID) ([]*entities.Project, error)
+	GetProjectListByUserId(
+		userId uuid.UUID,
+		qs *pagination.PaginationRequest,
+	) ([]*entities.Project, *pagination.PaginationResponse, error)
 	CreateProject(p *entities.Project) error
 }
 
@@ -18,7 +22,10 @@ func NewService() Service {
 	return &ProjectService{}
 }
 
-func (s *ProjectService) GetProjectListByUserId(userId uuid.UUID) ([]*entities.Project, error) {
+func (s *ProjectService) GetProjectListByUserId(
+	userId uuid.UUID,
+	req *pagination.PaginationRequest,
+) ([]*entities.Project, *pagination.PaginationResponse, error) {
 	db := database.DB
 
 	var projects []*entities.Project
@@ -26,7 +33,7 @@ func (s *ProjectService) GetProjectListByUserId(userId uuid.UUID) ([]*entities.P
 	var invitaions []*entities.Invitation
 
 	if err := db.Where("user_id = ?", userId).Find(&invitaions).Error; err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	projectIds := make([]uuid.UUID, 0, len(invitaions))
@@ -35,11 +42,13 @@ func (s *ProjectService) GetProjectListByUserId(userId uuid.UUID) ([]*entities.P
 		projectIds = append(projectIds, i.ProjectID)
 	}
 
-	if err := db.Where("id IN ?", projectIds).Find(&projects).Error; err != nil {
-		return nil, err
-	}
+	res := &pagination.PaginationResponse{}
 
-	return projects, nil
+	condition := db.Where("id IN (?)", projectIds)
+	condition.Scopes(pagination.Paginate(condition, projects, req, res)).
+		Find(&projects)
+
+	return projects, res, nil
 }
 
 func (s *ProjectService) CreateProject(p *entities.Project) error {

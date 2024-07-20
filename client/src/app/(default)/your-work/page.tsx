@@ -1,37 +1,14 @@
-import getProjectList from "@/actions/get-project-list";
+import YourWorkProjects from "@/components/your-work/projects";
 import Image from "next/image";
 
 export default async function YourWork() {
-  const { data, meta } = await getProjectList();
-
   return (
     <main className="flex-1 max-h-full p-5 overflow-hidden overflow-y-scroll">
       <div className="flex flex-col items-start justify-between pb-6 space-y-4 border-b lg:items-center lg:space-y-0 lg:flex-row">
         <h1 className="text-2xl font-semibold whitespace-nowrap">Your Work</h1>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 mt-6 sm:grid-cols-2 xl:grid-cols-5 lg:grid-cols-4">
-        {data.map((project) => (
-          <div
-            key={project.id}
-            className="p-4 transition-shadow border rounded-lg shadow-sm hover:shadow-lg"
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex flex-col space-y-2">
-                <span className="text-gray-400">Total Users</span>
-                <span className="text-lg font-semibold">100,221</span>
-              </div>
-              <div className="p-10 bg-gray-200 rounded-md"></div>
-            </div>
-            <div>
-              <span className="inline-block px-2 text-sm text-white bg-green-300 rounded">
-                14%
-              </span>
-              <span>from 2019</span>
-            </div>
-          </div>
-        ))}
-      </div>
+      <YourWorkProjects />
 
       <h3 className="mt-6 text-xl">Users</h3>
       <div className="flex flex-col mt-6">
