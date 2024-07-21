@@ -43,11 +43,11 @@ const YourWorkProjects = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-5 mt-6 sm:grid-cols-2 xl:grid-cols-5 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-8 mt-6 sm:grid-cols-2 xl:grid-cols-5 lg:grid-cols-4 xl:h-80">
         {projects.map((project) => (
           <div
             key={project.id}
-            className="p-4 transition-shadow border rounded-lg shadow-sm hover:shadow-lg"
+            className="p-4 transition-shadow border rounded-lg shadow-sm hover:shadow-lg h-36"
           >
             <div className="flex items-start justify-between">
               <div className="flex flex-col space-y-2">
@@ -56,12 +56,7 @@ const YourWorkProjects = () => {
               </div>
               <div className="p-10 bg-gray-200 rounded-md"></div>
             </div>
-            <div>
-              <span className="inline-block px-2 text-sm text-white bg-green-300 rounded">
-                14%
-              </span>
-              <span>from 2019</span>
-            </div>
+            <div className="truncate">{project.description}</div>
           </div>
         ))}
       </div>

@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import {
   useLayout,
@@ -21,6 +23,9 @@ const Sidebar = () => {
 
   return (
     <motion.aside
+      initial={{
+        width: size.width != null && size.width > 1024 ? "64px" : "0",
+      }}
       animate={{
         width: toggleSidebar
           ? "256px"
