@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/Hnamnguyen0112/todo-app/server/pkg/column"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/invitation"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/project"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/token"
@@ -12,6 +13,7 @@ type HandlerParams struct {
 	TokenService      token.Service
 	ProjectService    project.Service
 	InvitationService invitation.Service
+	ColumnService     column.Service
 }
 
 type Handler struct {
@@ -20,6 +22,7 @@ type Handler struct {
 	tokenService      token.Service
 	projectService    project.Service
 	invitationService invitation.Service
+	columnService     column.Service
 }
 
 func NewHandler(params HandlerParams) *Handler {
@@ -30,5 +33,6 @@ func NewHandler(params HandlerParams) *Handler {
 		tokenService:      params.TokenService,
 		projectService:    params.ProjectService,
 		invitationService: params.InvitationService,
+		columnService:     params.ColumnService,
 	}
 }

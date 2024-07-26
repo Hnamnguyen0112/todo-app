@@ -30,3 +30,27 @@ func (r *CreateProjectRequest) Bind(
 
 	return nil
 }
+
+type AddColumnToProjectRequest struct {
+	Name     string `json:"name"     validate:"required,min=3,max=50"`
+	Position int    `json:"position" validate:"required"`
+}
+
+func (r *AddColumnToProjectRequest) Bind(
+	c *fiber.Ctx,
+	p *entities.Column,
+	v *validator.Validate,
+) error {
+	if err := c.BodyParser(r); err != nil {
+		return err
+	}
+
+	if err := v.Struct(r); err != nil {
+		return err
+	}
+
+	p.Name = r.Name
+	p.Position = r.Position
+
+	return nil
+}

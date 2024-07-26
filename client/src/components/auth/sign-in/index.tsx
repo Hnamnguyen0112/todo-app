@@ -12,9 +12,13 @@ import toast from "@/components/toast";
 
 interface SignInProps {
   handleRedirectSignUp: () => void;
+  handleRedirectForgotPassword: () => void;
 }
 
-export default function SignIn({ handleRedirectSignUp }: SignInProps) {
+export default function SignIn({
+  handleRedirectSignUp,
+  handleRedirectForgotPassword,
+}: SignInProps) {
   const [isPending, startTransition] = useTransition();
   const { handleSubmit, reset, register } = useForm<
     z.infer<typeof SignInSchema>
@@ -88,9 +92,13 @@ export default function SignIn({ handleRedirectSignUp }: SignInProps) {
           <label className="block text-gray-700 text-sm font-semibold mb-2">
             Password
           </label>
-          <a href="#" className="text-xs text-gray-500">
+          <button
+            type="button"
+            className="text-xs text-gray-500"
+            onClick={handleRedirectForgotPassword}
+          >
             Forget Password?
-          </a>
+          </button>
         </div>
         <input
           className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"

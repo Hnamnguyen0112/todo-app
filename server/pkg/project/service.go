@@ -13,6 +13,7 @@ type Service interface {
 		userId uuid.UUID,
 		qs *pagination.PaginationRequest,
 	) ([]*entities.Project, *pagination.PaginationResponse, error)
+	GetProjectByIdAndUserId(id uuid.UUID, userId uuid.UUID) (*entities.Project, error)
 	CreateProject(p *entities.Project) error
 }
 
@@ -59,4 +60,22 @@ func (s *ProjectService) CreateProject(p *entities.Project) error {
 	}
 
 	return nil
+}
+
+func (s *ProjectService) GetProjectByIdAndUserId(
+	id uuid.UUID,
+	userId uuid.UUID,
+) (*entities.Project, error) {
+	db := database.DB
+
+	var project entities.Project
+
+	if err := db.Joins("JOIN invitations ON invitations.project_id = projects.id").
+		Where("invitations.user_id = ? AND projects.id = ?", userId, id).
+		Preload("Columns").
+		First(&project).Error; err != nil {
+		return nil, err
+	}
+
+	return &project, nil
 }

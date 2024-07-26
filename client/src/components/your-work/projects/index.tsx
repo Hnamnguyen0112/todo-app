@@ -8,9 +8,11 @@ import {
   DEFAULT_PAGINATION_PAGE,
 } from "@/utils/constants";
 import { Pagination } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 const YourWorkProjects = () => {
+  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [meta, setMeta] = useState({ total: 0, totalPages: 0 });
   const [page, setPage] = useState(DEFAULT_PAGINATION_PAGE);
@@ -41,13 +43,21 @@ const YourWorkProjects = () => {
     fetchProjects();
   }, [page, limit, keyword]);
 
+  const handleRedirect = useCallback(
+    (id: string) => {
+      router.push(`/projects/${id}`);
+    },
+    [router],
+  );
+
   return (
     <>
       <div className="grid grid-cols-1 gap-8 mt-6 sm:grid-cols-2 xl:grid-cols-5 lg:grid-cols-4 xl:h-80">
         {projects.map((project) => (
           <div
             key={project.id}
-            className="p-4 transition-shadow border rounded-lg shadow-sm hover:shadow-lg h-36"
+            className="p-4 transition-shadow border rounded-lg shadow-sm hover:shadow-lg h-36 cursor-pointer"
+            onClick={() => handleRedirect(project.id)}
           >
             <div className="flex items-start justify-between">
               <div className="flex flex-col space-y-2">

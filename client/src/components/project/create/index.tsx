@@ -32,7 +32,7 @@ const CreateProject = () => {
         .then((res) => {
           toast({
             type: "success",
-            message: "Account created successfully",
+            message: "Project created successfully",
           });
 
           router.push(`/projects/${res.data.id}`);

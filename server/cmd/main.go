@@ -18,6 +18,7 @@ import (
 	"github.com/Hnamnguyen0112/todo-app/server/internal/handler"
 	"github.com/Hnamnguyen0112/todo-app/server/internal/redis"
 	"github.com/Hnamnguyen0112/todo-app/server/internal/routes"
+	"github.com/Hnamnguyen0112/todo-app/server/pkg/column"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/invitation"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/middlewares"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/project"
@@ -37,6 +38,7 @@ func main() {
 	ts := token.NewService()
 	ps := project.NewService()
 	is := invitation.NewService()
+	cs := column.NewService()
 
 	app := fiber.New(fiber.Config{
 		ReadBufferSize: 4096 * 2,
@@ -64,6 +66,7 @@ func main() {
 		TokenService:      ts,
 		ProjectService:    ps,
 		InvitationService: is,
+		ColumnService:     cs,
 	})
 
 	routes.AuthRouter(v1.Group("/auth"), h)

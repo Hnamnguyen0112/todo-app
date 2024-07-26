@@ -42,7 +42,6 @@ func (s *InvitationService) SendInvitation(p *entities.Project, uid uuid.UUID, i
 		UserID:     user.ID,
 		IsOwner:    isOwner,
 		AcceptedAt: acceptedTime,
-		User:       user,
 	}
 
 	if err := db.Create(&invitation).Error; err != nil {

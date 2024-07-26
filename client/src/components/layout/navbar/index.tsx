@@ -13,6 +13,7 @@ import {
   BellIcon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
+  ChevronDownIcon,
   MagnifyingGlassIcon,
   Squares2X2Icon,
 } from "@heroicons/react/24/outline";
@@ -22,8 +23,11 @@ import {
   useLayoutActions,
 } from "@/components/providers/LayoutProvider";
 import signOut from "@/actions/sign-out";
+import clsx from "clsx";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
+  const pathname = usePathname();
   const { toggleSidebar } = useLayout();
   const { setToggleSidebar } = useLayoutActions();
 
@@ -44,7 +48,85 @@ const Navbar = () => {
           </button>
         </div>
 
-        <div className="items-center hidden px-2 space-x-2 md:flex-1 md:flex md:mr-auto md:ml-5">
+        <div className="relative flex items-center space-x-3 px-2">
+          <Menu>
+            <MenuButton
+              className={clsx(
+                pathname.includes("/your-work")
+                  ? "text-primary-500"
+                  : "text-gray-500",
+                "font-sans font-semibold text-sm flex px-2",
+              )}
+            >
+              Your Work
+              <ChevronDownIcon className="w-4 h-4 m-auto" />
+            </MenuButton>
+            <MenuItems
+              transition
+              anchor="bottom end"
+              className="shadow w-52 origin-top-right rounded-xl border border-gray-100 bg-white p-1 text-sm/6 text-black transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
+            ></MenuItems>
+          </Menu>
+
+          <Menu>
+            <MenuButton
+              className={clsx(
+                pathname.includes("/projects")
+                  ? "text-primary-500"
+                  : "text-gray-500",
+                "font-sans font-semibold text-sm flex px-2",
+              )}
+            >
+              Projects
+              <ChevronDownIcon className="w-4 h-4 m-auto" />
+            </MenuButton>
+            <MenuItems
+              transition
+              anchor="bottom end"
+              className="shadow w-52 origin-top-right rounded-xl border border-gray-100 bg-white p-1 text-sm/6 text-black transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
+            ></MenuItems>
+          </Menu>
+
+          <Menu>
+            <MenuButton
+              className={clsx(
+                pathname.includes("/filters")
+                  ? "text-primary-500"
+                  : "text-gray-500",
+                "font-sans font-semibold text-sm flex px-2",
+              )}
+            >
+              Filters
+              <ChevronDownIcon className="w-4 h-4 m-auto" />
+            </MenuButton>
+            <MenuItems
+              transition
+              anchor="bottom end"
+              className="shadow w-52 origin-top-right rounded-xl border border-gray-100 bg-white p-1 text-sm/6 text-black transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
+            ></MenuItems>
+          </Menu>
+
+          <Menu>
+            <MenuButton
+              className={clsx(
+                pathname.includes("/dashboards")
+                  ? "text-primary-500"
+                  : "text-gray-500",
+                "font-sans font-semibold text-sm flex px-2",
+              )}
+            >
+              Dashboards
+              <ChevronDownIcon className="w-4 h-4 m-auto" />
+            </MenuButton>
+            <MenuItems
+              transition
+              anchor="bottom end"
+              className="shadow w-52 origin-top-right rounded-xl border border-gray-100 bg-white p-1 text-sm/6 text-black transition duration-100 ease-out [--anchor-gap:var(--spacing-1)] focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
+            ></MenuItems>
+          </Menu>
+        </div>
+
+        <div className="items-center hidden space-x-2 md:flex md:mr-auto">
           <MagnifyingGlassIcon className="w-6 h-6 text-gray-500" />
           <input
             type="text"

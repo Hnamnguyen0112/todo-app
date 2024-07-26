@@ -22,3 +22,7 @@ export const SignUpSchema = z
       });
     }
   });
+
+export const ForgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
