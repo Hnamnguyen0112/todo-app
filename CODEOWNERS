@@ -1,0 +1,11 @@
+# Each line is a file pattern followed by one or more owners.
+# These owners will be requested to review changes that affect the files.
+
+# Default owner for everything in the repo
+*       @Hnamnguyen0112
+
+# server
+/server/ @Hnamnguyen0112
+
+# client
+/client/ @Hnamnguyen0112
