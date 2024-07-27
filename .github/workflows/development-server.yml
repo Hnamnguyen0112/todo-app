@@ -1,0 +1,37 @@
+name: Development Server
+
+on:
+  pull_request:
+    branches:
+      - dev
+    types: [closed]
+    paths:
+      - server/**
+      - .github/workflows/development-server.yml
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Build
+        run: go build -o ./tmp/main ./cmd/main.go
+
+      - name: Test
+        run: go test ./...
+
+      - name: Deploy
+        run: echo "Deploying to development server"
