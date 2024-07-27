@@ -1,0 +1,30 @@
+name: Development Client
+on:
+  pull_request:
+    branches:
+      - dev
+    types: [closed]
+    paths:
+      - client/**
+      - .github/workflows/development-client.yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    defaults:
+      run:
+        working-directory: ./client
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        run: echo "Deploying to development client"
