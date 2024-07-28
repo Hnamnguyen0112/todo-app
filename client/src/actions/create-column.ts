@@ -27,7 +27,7 @@ export default async function createColumn({
 
   try {
     const res = await fetch(
-      `${Env.BACKEND_URL}/api/v1/projects/${projectId}/add-column`,
+      `${Env.BACKEND_URL}/api/v1/projects/${projectId}/columns`,
       {
         method: "POST",
         headers: {

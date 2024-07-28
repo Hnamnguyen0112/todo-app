@@ -9,10 +9,10 @@ import (
 
 type Invitation struct {
 	ID         uuid.UUID      `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
-	ProjectID  uuid.UUID      `gorm:"type:uuid;not null;"                  json:"project_id"`
-	UserID     uuid.UUID      `gorm:"type:uuid;not null;"                  json:"user_id"`
-	IsOwner    bool           `gorm:"default:false;"                       json:"is_owner"`
-	AcceptedAt *time.Time     `gorm:"type:timestamp;"                      json:"accepted_at"`
+	ProjectID  uuid.UUID      `gorm:"type:uuid;not null;"                  json:"projectId"`
+	UserID     uuid.UUID      `gorm:"type:uuid;not null;"                  json:"userId"`
+	IsOwner    bool           `gorm:"default:false;"                       json:"isOwner"`
+	AcceptedAt *time.Time     `gorm:"type:timestamp;"                      json:"acceptedAt"`
 	CreatedAt  time.Time      `                                            json:"createdAt"`
 	UpdatedAt  time.Time      `                                            json:"updatedAt"`
 	DeletedAt  gorm.DeletedAt `gorm:"index"                                json:"deletedAt"`

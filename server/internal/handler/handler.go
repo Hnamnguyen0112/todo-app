@@ -4,6 +4,7 @@ import (
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/column"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/invitation"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/project"
+	"github.com/Hnamnguyen0112/todo-app/server/pkg/task"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/token"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/user"
 )
@@ -14,6 +15,7 @@ type HandlerParams struct {
 	ProjectService    project.Service
 	InvitationService invitation.Service
 	ColumnService     column.Service
+	TaskService       task.Service
 }
 
 type Handler struct {
@@ -23,6 +25,7 @@ type Handler struct {
 	projectService    project.Service
 	invitationService invitation.Service
 	columnService     column.Service
+	taskService       task.Service
 }
 
 func NewHandler(params HandlerParams) *Handler {
@@ -34,5 +37,6 @@ func NewHandler(params HandlerParams) *Handler {
 		projectService:    params.ProjectService,
 		invitationService: params.InvitationService,
 		columnService:     params.ColumnService,
+		taskService:       params.TaskService,
 	}
 }

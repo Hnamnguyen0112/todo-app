@@ -10,6 +10,7 @@ import (
 type Service interface {
 	CreateColumnByProjectId(projectId uuid.UUID, c *entities.Column) error
 	FindColumnsByProjectIdAndPosition(projectId uuid.UUID, position int) ([]entities.Column, error)
+	FindColumnByIdAndProjectId(id uuid.UUID, projectId uuid.UUID) (*entities.Column, error)
 }
 
 type ColumnService struct{}
@@ -28,6 +29,21 @@ func (s *ColumnService) CreateColumnByProjectId(projectId uuid.UUID, c *entities
 	}
 
 	return nil
+}
+
+func (s *ColumnService) FindColumnByIdAndProjectId(
+	id uuid.UUID,
+	projectId uuid.UUID,
+) (*entities.Column, error) {
+	db := database.DB
+
+	var column entities.Column
+
+	if err := db.Where("id = ? AND project_id = ?", id, projectId).First(&column).Error; err != nil {
+		return nil, err
+	}
+
+	return &column, nil
 }
 
 func (s *ColumnService) FindColumnsByProjectIdAndPosition(
