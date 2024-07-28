@@ -143,3 +143,44 @@ func (h *Handler) AddColumnToProject(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusOK)
 }
+
+func (h *Handler) AddTaskToProject(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userIdString := claims["sub"].(string)
+
+	userId, err := uuid.Parse(userIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	projectIdString := c.Params("id")
+	projectId, err := uuid.Parse(projectIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	req := &presenter.AddTaskToProjectRequest{}
+	t := &entities.Task{}
+
+	if err := req.Bind(c, t, h.validator.validator); err != nil {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
+	}
+
+	p, err := h.projectService.GetProjectByIdAndUserId(projectId, userId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	if _, err := h.columnService.FindColumnByIdAndProjectId(t.ColumnID, p.ID); err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	if err := h.taskService.CreateTask(t); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	c.Locals("data", presenter.AddTaskToProjectSuccessResponse(t))
+
+	return c.SendStatus(fiber.StatusOK)
+}

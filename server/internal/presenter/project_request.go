@@ -3,8 +3,10 @@ package presenter
 import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/entities"
+	"github.com/Hnamnguyen0112/todo-app/server/pkg/utils"
 )
 
 type CreateProjectRequest struct {
@@ -51,6 +53,40 @@ func (r *AddColumnToProjectRequest) Bind(
 
 	p.Name = r.Name
 	p.Position = r.Position
+
+	return nil
+}
+
+type AddTaskToProjectRequest struct {
+	ColumnID    uuid.UUID `json:"columnId"    validate:"required"`
+	AssigneeID  uuid.UUID `json:"assigneeId"  validate:"required"`
+	Title       string    `json:"title"       validate:"required,min=3,max=50"`
+	Description string    `json:"description" validate:"required,min=3,max=2000"`
+	Priority    int       `json:"priority"    validate:"required"`
+	DueDate     int64     `json:"dueDate"     validate:"required"`
+}
+
+func (r *AddTaskToProjectRequest) Bind(
+	c *fiber.Ctx,
+	t *entities.Task,
+	v *validator.Validate,
+) error {
+	v.RegisterCustomTypeFunc(utils.ValidateUUID, uuid.UUID{})
+
+	if err := c.BodyParser(r); err != nil {
+		return err
+	}
+
+	if err := v.Struct(r); err != nil {
+		return err
+	}
+
+	t.ColumnID = r.ColumnID
+	t.AssigneeID = r.AssigneeID
+	t.Title = r.Title
+	t.Description = r.Description
+	t.Priority = r.Priority
+	t.DueDate = utils.ParseUnixTimestampToTime(r.DueDate)
 
 	return nil
 }

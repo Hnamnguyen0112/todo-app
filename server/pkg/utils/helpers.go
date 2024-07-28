@@ -2,8 +2,11 @@ package utils
 
 import (
 	"net/mail"
+	"reflect"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 var StatusCodeMessages = map[int]string{
@@ -74,4 +77,15 @@ var StatusCodeMessages = map[int]string{
 func IsEmail(email string) bool {
 	_, err := mail.ParseAddress(email)
 	return err == nil
+}
+
+func ValidateUUID(field reflect.Value) interface{} {
+	if valuer, ok := field.Interface().(uuid.UUID); ok {
+		return valuer.String()
+	}
+	return nil
+}
+
+func ParseUnixTimestampToTime(timestamp int64) time.Time {
+	return time.Unix(timestamp, 0)
 }

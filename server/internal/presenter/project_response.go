@@ -38,3 +38,18 @@ func AddColumnToProjectSuccessResponse(c *entities.Column) map[string]interface{
 		"deletedAt": c.DeletedAt,
 	}
 }
+
+func AddTaskToProjectSuccessResponse(t *entities.Task) map[string]interface{} {
+	return map[string]interface{}{
+		"id":          t.ID,
+		"column_id":   t.ColumnID,
+		"assignee_id": t.AssigneeID,
+		"title":       t.Title,
+		"description": t.Description,
+		"priority":    t.Priority,
+		"due_date":    t.DueDate,
+		"createdAt":   t.CreatedAt,
+		"updatedAt":   t.UpdatedAt,
+		"deletedAt":   t.DeletedAt,
+	}
+}
