@@ -1,6 +1,6 @@
 "use client";
 
-import reorder, { reorderQuoteMap } from "@/utils/reorder";
+import reorder from "@/utils/reorder";
 import { useState } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import ProjectColumn from "../column";
@@ -9,33 +9,42 @@ import { Column } from "@/interfaces/column";
 
 interface ProjectBoardProps {
   isCombineEnabled: boolean;
-  initial: any;
-  columns: Column[];
+  initial: Column[];
 }
 
 const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
-  const [columns, setColumns] = useState(initial);
-
-  const [ordered, setOrdered] = useState(Object.keys(initial));
+  const [columns, setColumns] = useState([
+    ...initial,
+    { name: "add-column", tasks: [] },
+  ]);
 
   const onDragEnd = (result: DropResult) => {
     if (result.combine) {
       if (result.type === "COLUMN") {
-        const shallow = [...ordered];
+        const shallow = [...columns];
         shallow.splice(result.source.index, 1);
-        setOrdered(shallow);
+        setColumns(shallow);
         return;
       }
 
-      const column = columns[result.source.droppableId];
-      const withQuoteRemoved = [...column];
-      withQuoteRemoved.splice(result.source.index, 1);
+      if (result.type === "TASK") {
+        const column = columns.find(
+          (column) => column.id === result.source.droppableId,
+        );
 
-      const orderedColumns = {
-        ...columns,
-        [result.source.droppableId]: withQuoteRemoved,
-      };
-      setColumns(orderedColumns);
+        if (!column) {
+          return;
+        }
+
+        const shallow = [...column.tasks];
+        shallow.splice(result.source.index, 1);
+        setColumns(
+          columns.map((col) =>
+            col.id === column.id ? { ...column, tasks: shallow } : col,
+          ),
+        );
+        return;
+      }
       return;
     }
 
@@ -57,20 +66,42 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
 
     // reordering column
     if (result.type === "COLUMN") {
-      const reorderedorder = reorder(ordered, source.index, destination.index);
+      const reorderedorder = reorder(columns, source.index, destination.index);
 
-      setOrdered(reorderedorder);
+      setColumns(reorderedorder);
 
       return;
     }
 
-    const data = reorderQuoteMap({
-      quoteMap: columns,
-      source,
-      destination,
-    });
+    if (result.type === "TASK") {
+      const column = columns.find((column) => column.id === source.droppableId);
+      if (!column) {
+        return;
+      }
 
-    setColumns(data.quoteMap);
+      setColumns((prev) => {
+        const newColumns = [...prev];
+        const newColumn = { ...column };
+        const [removed] = newColumn.tasks.splice(source.index, 1);
+
+        newColumns.find((col) => col.id === newColumn.id)!.tasks =
+          newColumn.tasks;
+
+        const targetColumn = newColumns.find(
+          (col) => col.id === destination.droppableId,
+        );
+
+        if (!targetColumn) {
+          return newColumns;
+        }
+
+        targetColumn.tasks.splice(destination.index, 0, removed);
+
+        return newColumns;
+      });
+
+      return;
+    }
   };
 
   return (
@@ -83,11 +114,10 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
           isCombineEnabled={isCombineEnabled}
           className="gap-x-2"
         >
-          {ordered.map((key, index) => (
+          {columns.map((column, index) => (
             <ProjectColumn
-              key={key}
-              title={key}
-              quotes={columns[key]}
+              key={column.id}
+              column={column}
               index={index}
               isScrollable={false}
               isCombineEnabled={isCombineEnabled}

@@ -176,6 +176,12 @@ func (h *Handler) AddTaskToProject(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
 
+	if existingTasks, err := h.taskService.FindTasksByColumnIdAndPosition(t.ColumnID, t.Position); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	} else if len(existingTasks) > 0 {
+		return fiber.NewError(fiber.StatusConflict, "task with this position already exists")
+	}
+
 	if err := h.taskService.CreateTask(t); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}

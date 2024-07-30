@@ -73,6 +73,7 @@ func (s *ProjectService) GetProjectByIdAndUserId(
 	if err := db.Joins("JOIN invitations ON invitations.project_id = projects.id").
 		Where("invitations.user_id = ? AND projects.id = ?", userId, id).
 		Preload("Columns").
+		Preload("Columns.Tasks").
 		First(&project).Error; err != nil {
 		return nil, err
 	}
