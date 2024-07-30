@@ -15,6 +15,7 @@ type Task struct {
 	Description string         `gorm:"type:text;"                           json:"description" validate:"max=2000"`
 	Priority    int            `gorm:"not null;"                            json:"priority"`
 	DueDate     time.Time      `gorm:"type:timestamp;"                      json:"dueDate"`
+	Position    int            `gorm:"not null;"                            json:"position"`
 	CreatedAt   time.Time      `                                            json:"createdAt"`
 	UpdatedAt   time.Time      `                                            json:"updatedAt"`
 	DeletedAt   gorm.DeletedAt `gorm:"index"                                json:"deletedAt"`

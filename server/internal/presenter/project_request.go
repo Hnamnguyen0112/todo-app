@@ -64,6 +64,7 @@ type AddTaskToProjectRequest struct {
 	Description string    `json:"description" validate:"required,min=3,max=2000"`
 	Priority    int       `json:"priority"    validate:"required"`
 	DueDate     int64     `json:"dueDate"     validate:"required"`
+	Position    int       `json:"position"    validate:"required"`
 }
 
 func (r *AddTaskToProjectRequest) Bind(
@@ -87,6 +88,7 @@ func (r *AddTaskToProjectRequest) Bind(
 	t.Description = r.Description
 	t.Priority = r.Priority
 	t.DueDate = utils.ParseUnixTimestampToTime(r.DueDate)
+	t.Position = r.Position
 
 	return nil
 }

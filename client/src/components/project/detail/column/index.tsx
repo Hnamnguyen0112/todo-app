@@ -6,10 +6,10 @@ import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import createColumn from "@/actions/create-column";
 import toast from "@/components/toast";
 import { useParams } from "next/navigation";
+import { Column } from "@/interfaces/column";
 
 interface ProjectColumnProps {
-  title: string;
-  quotes: any;
+  column: Column;
   index: number;
   isScrollable: boolean;
   isCombineEnabled: boolean;
@@ -20,9 +20,7 @@ const ProjectColumn = (props: ProjectColumnProps) => {
 
   const { id } = params;
 
-  const title = props.title;
-  const quotes = props.quotes;
-  const index = props.index;
+  const { column, index } = props;
 
   const [open, setOpen] = useState(false);
   const [newColumn, setNewColumn] = useState("");
@@ -61,15 +59,15 @@ const ProjectColumn = (props: ProjectColumnProps) => {
 
   return (
     <Draggable
-      draggableId={title}
+      draggableId={column.id}
       index={index}
       className={clsx(
-        props.title !== "add-column" &&
+        column.name !== "add-column" &&
           "xl:w-1/5 p-2 bg-gray-100 rounded-lg shadow-md",
       )}
     >
-      {props.title !== "add-column" ? (
-        <p className="mb-2 text-black">{title}</p>
+      {column.name !== "add-column" ? (
+        <p className="mb-2 text-black">{column.name}</p>
       ) : open ? (
         <>
           <div className="bg-gray-100 p-0.5 rounded-lg shadow-md mb-1">
@@ -107,22 +105,22 @@ const ProjectColumn = (props: ProjectColumnProps) => {
           <PlusIcon className="w-6 h-6" />
         </button>
       )}
-      {props.title !== "add-column" && (
+      {column.name !== "add-column" && (
         <Droppable
           direction="vertical"
-          droppableId={title}
+          droppableId={column.id}
           type="TASK"
           isCombineEnabled={props.isCombineEnabled}
           className="gap-y-2 h-full"
         >
-          {quotes.map((quote: any, index: number) => (
+          {column.tasks.map((task: any, index: number) => (
             <Draggable
-              draggableId={quote.id}
+              draggableId={task.id}
               index={index}
-              key={quote.id}
+              key={task.id}
               className="p-2 bg-white rounded-lg shadow-md text-black"
             >
-              {quote.content}
+              {task.title}
             </Draggable>
           ))}
         </Droppable>

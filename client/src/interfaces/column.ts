@@ -1,3 +1,5 @@
+import { Task } from "./task";
+
 export interface Column {
   id: string;
   projectId: string;
@@ -6,4 +8,5 @@ export interface Column {
   createdAt: string;
   updatedAt: string;
   deletedAt: string;
+  tasks: Task[];
 }
