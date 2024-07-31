@@ -6,10 +6,11 @@ import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import ProjectColumn from "../column";
 import Droppable from "../droppable";
 import { Column } from "@/interfaces/column";
-import createColumn from "@/actions/create-column";
 import toast from "@/components/toast";
 import { useParams } from "next/navigation";
-import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import deleteColumn from "@/actions/delete-column";
+import useCreateColumn from "../create-column";
 
 interface ProjectBoardProps {
   isCombineEnabled: boolean;
@@ -20,10 +21,14 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
   const params = useParams();
   const { id } = params;
 
-  const [columns, setColumns] = useState([...initial]);
-  const [open, setOpen] = useState(false);
-  const [newColumn, setNewColumn] = useState("");
+  const [columns, setColumns] = useState<Column[]>([...initial]);
+
   const [isPending, strartTransition] = useTransition();
+
+  const { setOpen, open, CreateColumn } = useCreateColumn({
+    columns,
+    setColumns,
+  });
 
   const onDragEnd = (result: DropResult) => {
     if (result.combine) {
@@ -111,35 +116,6 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
     }
   };
 
-  const handleCreateColumn = () => {
-    const payload = {
-      name: newColumn,
-      position: columns.length + 1,
-    };
-
-    strartTransition(() => {
-      createColumn({ projectId: id as string, payload })
-        .then(({ data }) => {
-          toast({
-            type: "success",
-            message: "Column created successfully",
-          });
-
-          setColumns((prev) => [...prev, data]);
-        })
-        .catch(() => {
-          toast({
-            type: "error",
-            message: "Something went wrong",
-          });
-        })
-        .finally(() => {
-          setNewColumn("");
-          setOpen(false);
-        });
-    });
-  };
-
   const handleOpenCreateColumn = useCallback(() => {
     const boardEl = document.querySelector(
       `div[data-rbd-droppable-id="board"]`,
@@ -154,7 +130,30 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
     }
 
     setOpen(true);
-  }, []);
+  }, [setOpen]);
+
+  const handleDeleteColumn = useCallback(
+    (columnId: string) => {
+      strartTransition(() => {
+        deleteColumn({ columnId: columnId, projectId: id as string })
+          .then(() => {
+            toast({
+              type: "success",
+              message: "Column deleted successfully",
+            });
+
+            setColumns((prev) => prev.filter((col) => col.id !== columnId));
+          })
+          .catch((error) => {
+            toast({
+              type: "error",
+              message: error.message,
+            });
+          });
+      });
+    },
+    [id],
+  );
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -172,32 +171,12 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
             index={index}
             isScrollable={false}
             isCombineEnabled={isCombineEnabled}
+            onDelete={handleDeleteColumn}
           />
         ))}
-        {open ? (
-          <div className="flex flex-col bg-gray-100 p-2 rounded-lg h-28 justify-between">
-            <input
-              type="text"
-              value={newColumn}
-              onChange={(e) => setNewColumn(e.target.value)}
-              className="w-40 lg:w-60 xl:w-80 p-2 bg-white rounded-lg shadow-md"
-            />
-            <div className="flex flex-row justify-end gap-x-2">
-              <button
-                onClick={handleCreateColumn}
-                className="p-2 bg-white rounded-lg text-gray-800 text-left mt-2 shadow-md"
-              >
-                <CheckIcon className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setOpen(false)}
-                className="p-2 bg-white rounded-lg text-gray-800 text-left mt-2 shadow-md"
-              >
-                <XMarkIcon className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        ) : (
+
+        <CreateColumn />
+        {!open && (
           <button
             onClick={handleOpenCreateColumn}
             className="px-2 h-10 bg-gray-100 rounded-lg text-black text-left hover:bg-gray-200 transition-all duration-200"

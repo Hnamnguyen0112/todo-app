@@ -19,7 +19,7 @@ export default async function ProjectDetail({
   const { data } = await getProjectDetail({ id });
 
   return (
-    <main className="flex-1 max-h-full p-5 overflow-hidden overflow-y-scroll">
+    <main className="flex-1 max-h-full p-5">
       <div className="flex flex-col items-start justify-between pb-6 space-y-4 border-b lg:items-center lg:space-y-0 lg:flex-row mb-2">
         <h1 className="text-xl font-semibold whitespace-nowrap text-black">
           Projects / {data.name}
