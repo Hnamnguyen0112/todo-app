@@ -102,14 +102,14 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
   };
 
   return (
-    <>
-      <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="flex overflow-x-auto overflow-y-hidden" id="board">
         <Droppable
           droppableId="board"
           type="COLUMN"
           direction="horizontal"
           isCombineEnabled={isCombineEnabled}
-          className="gap-x-2"
+          className="gap-x-2 min-w-[100vw] min-h-[calc(100vh-175px)]"
         >
           {columns.map((column, index) => (
             <ProjectColumn
@@ -118,11 +118,12 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
               index={index}
               isScrollable={false}
               isCombineEnabled={isCombineEnabled}
+              isLast={index === columns.length - 1}
             />
           ))}
         </Droppable>
-      </DragDropContext>
-    </>
+      </div>
+    </DragDropContext>
   );
 };
 

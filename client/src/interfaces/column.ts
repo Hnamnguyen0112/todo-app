@@ -7,6 +7,6 @@ export interface Column {
   position: number;
   createdAt: string;
   updatedAt: string;
-  deletedAt: string;
+  deletedAt: string | null;
   tasks: Task[];
 }
