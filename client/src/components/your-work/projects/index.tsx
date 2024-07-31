@@ -61,12 +61,14 @@ const YourWorkProjects = () => {
           >
             <div className="flex items-start justify-between">
               <div className="flex flex-col space-y-2">
-                <span className="text-gray-400">{project.name}</span>
-                <span className="text-lg font-semibold">100,221</span>
+                <span className="text-gray-800">{project.name}</span>
+                <span className="text-lg font-semibold text-gray-400">
+                  100,221
+                </span>
               </div>
               <div className="p-10 bg-gray-200 rounded-md"></div>
             </div>
-            <div className="truncate">{project.description}</div>
+            <div className="truncate text-gray-600">{project.description}</div>
           </div>
         ))}
       </div>
