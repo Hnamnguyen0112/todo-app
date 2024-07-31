@@ -13,10 +13,7 @@ interface ProjectBoardProps {
 }
 
 const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
-  const [columns, setColumns] = useState([
-    ...initial,
-    { name: "add-column", tasks: [] },
-  ]);
+  const [columns, setColumns] = useState([...initial]);
 
   const onDragEnd = (result: DropResult) => {
     if (result.combine) {
