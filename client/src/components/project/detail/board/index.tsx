@@ -1,11 +1,15 @@
 "use client";
 
 import reorder from "@/utils/reorder";
-import { useState } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import ProjectColumn from "../column";
 import Droppable from "../droppable";
 import { Column } from "@/interfaces/column";
+import createColumn from "@/actions/create-column";
+import toast from "@/components/toast";
+import { useParams } from "next/navigation";
+import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 interface ProjectBoardProps {
   isCombineEnabled: boolean;
@@ -13,7 +17,13 @@ interface ProjectBoardProps {
 }
 
 const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
+  const params = useParams();
+  const { id } = params;
+
   const [columns, setColumns] = useState([...initial]);
+  const [open, setOpen] = useState(false);
+  const [newColumn, setNewColumn] = useState("");
+  const [isPending, strartTransition] = useTransition();
 
   const onDragEnd = (result: DropResult) => {
     if (result.combine) {
@@ -101,28 +111,101 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
     }
   };
 
+  const handleCreateColumn = () => {
+    const payload = {
+      name: newColumn,
+      position: columns.length + 1,
+    };
+
+    strartTransition(() => {
+      createColumn({ projectId: id as string, payload })
+        .then(({ data }) => {
+          toast({
+            type: "success",
+            message: "Column created successfully",
+          });
+
+          setColumns((prev) => [...prev, data]);
+        })
+        .catch(() => {
+          toast({
+            type: "error",
+            message: "Something went wrong",
+          });
+        })
+        .finally(() => {
+          setNewColumn("");
+          setOpen(false);
+        });
+    });
+  };
+
+  const handleOpenCreateColumn = useCallback(() => {
+    const boardEl = document.querySelector(
+      `div[data-rbd-droppable-id="board"]`,
+    );
+    if (boardEl) {
+      setTimeout(() => {
+        boardEl.scrollTo({
+          left: boardEl.scrollWidth,
+          behavior: "smooth",
+        });
+      }, 0);
+    }
+
+    setOpen(true);
+  }, []);
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex overflow-x-auto overflow-y-hidden" id="board">
-        <Droppable
-          droppableId="board"
-          type="COLUMN"
-          direction="horizontal"
-          isCombineEnabled={isCombineEnabled}
-          className="gap-x-2 min-w-[100vw] min-h-[calc(100vh-175px)]"
-        >
-          {columns.map((column, index) => (
-            <ProjectColumn
-              key={column.id}
-              column={column}
-              index={index}
-              isScrollable={false}
-              isCombineEnabled={isCombineEnabled}
-              isLast={index === columns.length - 1}
+      <Droppable
+        droppableId="board"
+        type="COLUMN"
+        direction="horizontal"
+        isCombineEnabled={isCombineEnabled}
+        className="gap-x-4 overflow-x-auto overflow-y-hidden min-h-[calc(100vh-175px)]"
+      >
+        {columns.map((column, index) => (
+          <ProjectColumn
+            key={column.id}
+            column={column}
+            index={index}
+            isScrollable={false}
+            isCombineEnabled={isCombineEnabled}
+          />
+        ))}
+        {open ? (
+          <div className="flex flex-col bg-gray-100 p-2 rounded-lg h-28 justify-between">
+            <input
+              type="text"
+              value={newColumn}
+              onChange={(e) => setNewColumn(e.target.value)}
+              className="w-40 lg:w-60 xl:w-80 p-2 bg-white rounded-lg shadow-md"
             />
-          ))}
-        </Droppable>
-      </div>
+            <div className="flex flex-row justify-end gap-x-2">
+              <button
+                onClick={handleCreateColumn}
+                className="p-2 bg-white rounded-lg text-gray-800 text-left mt-2 shadow-md"
+              >
+                <CheckIcon className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setOpen(false)}
+                className="p-2 bg-white rounded-lg text-gray-800 text-left mt-2 shadow-md"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={handleOpenCreateColumn}
+            className="px-2 h-10 bg-gray-100 rounded-lg text-black text-left hover:bg-gray-200 transition-all duration-200"
+          >
+            <PlusIcon className="w-5 h-5" />
+          </button>
+        )}
+      </Droppable>
     </DragDropContext>
   );
 };

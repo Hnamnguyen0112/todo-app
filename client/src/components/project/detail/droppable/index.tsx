@@ -31,7 +31,7 @@ const Droppable = ({
           ref={provided.innerRef}
           className={clsx(
             direction === "vertical" && "flex flex-col",
-            direction === "horizontal" && "inline-flex",
+            direction === "horizontal" && "flex flex-row",
             className,
           )}
         >

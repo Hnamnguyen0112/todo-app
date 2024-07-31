@@ -190,3 +190,37 @@ func (h *Handler) AddTaskToProject(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusOK)
 }
+
+func (h *Handler) DeleteColumnFromProject(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userIdString := claims["sub"].(string)
+
+	userId, err := uuid.Parse(userIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	projectIdString := c.Params("id")
+	projectId, err := uuid.Parse(projectIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	columnIdString := c.Params("columnId")
+	columnId, err := uuid.Parse(columnIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	p, err := h.projectService.GetProjectByIdAndUserId(projectId, userId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	if err := h.columnService.DeleteColumnByIdAndProjectId(columnId, p.ID); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(fiber.StatusOK)
+}
