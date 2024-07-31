@@ -53,6 +53,7 @@ func (r *AddColumnToProjectRequest) Bind(
 
 	p.Name = r.Name
 	p.Position = r.Position
+	p.Tasks = []entities.Task{}
 
 	return nil
 }

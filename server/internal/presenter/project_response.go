@@ -36,6 +36,7 @@ func AddColumnToProjectSuccessResponse(c *entities.Column) map[string]interface{
 		"createdAt": c.CreatedAt,
 		"updatedAt": c.UpdatedAt,
 		"deletedAt": c.DeletedAt,
+		"tasks":     c.Tasks,
 	}
 }
 
