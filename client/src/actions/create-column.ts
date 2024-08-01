@@ -5,14 +5,14 @@ import { Env } from "@/libs/env";
 import { CreateColumnSchema } from "@/schemas/column";
 import { z } from "zod";
 
-interface AddColumnProps {
+interface CreateColumnProps {
   projectId: string;
   payload: z.infer<typeof CreateColumnSchema>;
 }
 export default async function createColumn({
   projectId,
   payload,
-}: AddColumnProps) {
+}: CreateColumnProps) {
   const session = await auth();
 
   if (!session) {

@@ -21,7 +21,9 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
   const params = useParams();
   const { id } = params;
 
-  const [columns, setColumns] = useState<Column[]>([...initial]);
+  const [columns, setColumns] = useState<Column[]>(
+    [...initial].sort((a, b) => a.position - b.position),
+  );
 
   const [isPending, strartTransition] = useTransition();
 
@@ -172,6 +174,7 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
             isScrollable={false}
             isCombineEnabled={isCombineEnabled}
             onDelete={handleDeleteColumn}
+            setColumns={setColumns}
           />
         ))}
 
