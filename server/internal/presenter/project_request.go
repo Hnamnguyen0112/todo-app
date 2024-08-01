@@ -60,9 +60,9 @@ func (r *AddColumnToProjectRequest) Bind(
 
 type AddTaskToProjectRequest struct {
 	ColumnID    uuid.UUID `json:"columnId"    validate:"required"`
-	AssigneeID  uuid.UUID `json:"assigneeId"  validate:"required"`
+	AssigneeID  uuid.UUID `json:"assigneeId"`
 	Title       string    `json:"title"       validate:"required,min=3,max=50"`
-	Description string    `json:"description" validate:"required,min=3,max=2000"`
+	Description string    `json:"description" validate:"max=2000"`
 	Priority    int       `json:"priority"    validate:"required"`
 	DueDate     int64     `json:"dueDate"     validate:"required"`
 	Position    int       `json:"position"    validate:"required"`
@@ -84,7 +84,9 @@ func (r *AddTaskToProjectRequest) Bind(
 	}
 
 	t.ColumnID = r.ColumnID
-	t.AssigneeID = r.AssigneeID
+	if r.AssigneeID != uuid.Nil {
+		t.AssigneeID = &r.AssigneeID
+	}
 	t.Title = r.Title
 	t.Description = r.Description
 	t.Priority = r.Priority

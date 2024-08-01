@@ -5,8 +5,8 @@ import { EllipsisVerticalIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Task } from "@/interfaces/task";
 import TaskComponent from "../task";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { useEffect, useRef, useState } from "react";
-import clsx from "clsx";
+import { Dispatch, SetStateAction } from "react";
+import useCreateTask from "../create-task";
 
 interface ProjectColumnProps {
   column: Column;
@@ -14,6 +14,7 @@ interface ProjectColumnProps {
   isScrollable: boolean;
   isCombineEnabled: boolean;
   onDelete: (columnId: string) => void;
+  setColumns: Dispatch<SetStateAction<Column[]>>;
 }
 
 const ProjectColumn = ({
@@ -21,28 +22,12 @@ const ProjectColumn = ({
   index,
   onDelete,
   isCombineEnabled,
+  setColumns,
 }: ProjectColumnProps) => {
-  const [openCreateTask, setOpenCreateTask] = useState(false);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const element = inputRef.current;
-
-    if (element) {
-      element.addEventListener("blur", () => {
-        setOpenCreateTask(false);
-      });
-    }
-
-    return () => {
-      if (element) {
-        element.removeEventListener("blur", () => {
-          setOpenCreateTask(false);
-        });
-      }
-    };
-  }, [inputRef]);
+  const { open, setOpen, CreateTask, formRef } = useCreateTask({
+    column,
+    setColumns,
+  });
 
   return (
     <Draggable
@@ -82,40 +67,22 @@ const ProjectColumn = ({
         isCombineEnabled={isCombineEnabled}
         className="gap-y-2 h-full"
       >
-        {column.tasks.map((task: Task, index: number) => (
-          <TaskComponent key={task.id} task={task} index={index} />
-        ))}
+        {column.tasks
+          .sort((a, b) => a.position - b.position)
+          .map((task: Task, index: number) => (
+            <TaskComponent key={task.id} task={task} index={index} />
+          ))}
 
-        <div
-          className={clsx(
-            !openCreateTask ? "hidden" : "flex",
-            "flex-col bg-white p-2 rounded h-28 justify-between border-2 border-primary-500",
-          )}
-        >
-          <input
-            type="text"
-            className="p-2 bg-white text-black focus:outline-none"
-            ref={inputRef}
-          />
-          <div className="flex flex-row justify-end gap-x-2">
-            <button
-              type="button"
-              className="py-1 px-2 bg-primary-500 rounded text-white text-left shadow-md"
-              onClick={() => setOpenCreateTask(false)}
-            >
-              Create
-            </button>
-          </div>
-        </div>
+        <CreateTask />
 
-        {!openCreateTask && (
+        {!open && (
           <button
             type="button"
             className="hidden group-hover:flex gap-x-2 flex-row px-4 py-2 bg-gray-100 rounded text-black w-full text-left hover:bg-gray-200 transition-all duration-200"
             onClick={() => {
-              setOpenCreateTask(true);
+              setOpen(true);
               setTimeout(() => {
-                inputRef.current?.focus();
+                formRef.current?.focus();
               }, 0);
             }}
           >
