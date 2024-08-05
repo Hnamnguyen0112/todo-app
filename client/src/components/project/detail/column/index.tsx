@@ -5,8 +5,18 @@ import { EllipsisVerticalIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Task } from "@/interfaces/task";
 import TaskComponent from "../task";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { Dispatch, SetStateAction } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useRef,
+  useState,
+  TransitionStartFunction,
+} from "react";
 import useCreateTask from "../create-task";
+import { UpdateColumnSchema } from "@/schemas/column";
+import updateColumn from "@/actions/update-column";
+import toast from "@/components/toast";
+import { useParams } from "next/navigation";
 
 interface ProjectColumnProps {
   column: Column;
@@ -15,6 +25,7 @@ interface ProjectColumnProps {
   isCombineEnabled: boolean;
   onDelete: (columnId: string) => void;
   setColumns: Dispatch<SetStateAction<Column[]>>;
+  startTransition: TransitionStartFunction;
 }
 
 const ProjectColumn = ({
@@ -23,11 +34,42 @@ const ProjectColumn = ({
   onDelete,
   isCombineEnabled,
   setColumns,
+  startTransition,
 }: ProjectColumnProps) => {
+  const params = useParams();
+  const { id } = params;
+
+  const [state, setState] = useState<"view" | "edit">("view");
   const { open, setOpen, CreateTask, formRef } = useCreateTask({
     column,
     setColumns,
   });
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpdate = () => {
+    const updateColumnPayload = UpdateColumnSchema.parse({
+      name: column.name,
+      position: column.position,
+    });
+
+    startTransition(() => {
+      updateColumn({
+        projectId: id as string,
+        columnId: column.id,
+        payload: updateColumnPayload,
+      })
+        .catch((error) => {
+          toast({
+            type: "error",
+            message: error.message,
+          });
+        })
+        .finally(() => {
+          setState("view");
+        });
+    });
+  };
 
   return (
     <Draggable
@@ -36,7 +78,41 @@ const ProjectColumn = ({
       className="min-w-40 lg:min-w-60 xl:min-w-80 p-2 bg-gray-100 rounded-lg shadow-md relative group"
     >
       <div className="flex flex-row justify-between mb-2">
-        <p className="mb-2 text-black my-auto">{column.name}</p>
+        {state === "view" && (
+          <p
+            className="mb-2 text-black my-auto w-full"
+            onClick={() => {
+              setState("edit");
+              setTimeout(() => {
+                inputRef.current?.focus();
+              }, 0);
+            }}
+          >
+            {column.name}
+          </p>
+        )}
+        {state === "edit" && (
+          <input
+            ref={inputRef}
+            type="text"
+            className="text-black my-auto w-full px-2 py-1 rounded-lg shadow-sm focus:outline-none"
+            value={column.name}
+            onChange={(e) => {
+              setColumns((prev) =>
+                prev.map((col) => {
+                  if (col.id === column.id) {
+                    return {
+                      ...col,
+                      name: e.target.value,
+                    };
+                  }
+                  return col;
+                }),
+              );
+            }}
+            onBlur={handleUpdate}
+          />
+        )}
         <Menu>
           <MenuButton className="p-2 bg-gray-50 rounded-lg text-black text-left shadow focus:outline-none ">
             <EllipsisVerticalIcon className="w-5 h-5" />

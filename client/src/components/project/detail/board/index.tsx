@@ -200,6 +200,7 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
             isCombineEnabled={isCombineEnabled}
             onDelete={handleDeleteColumn}
             setColumns={setColumns}
+            startTransition={strartTransition}
           />
         ))}
 
