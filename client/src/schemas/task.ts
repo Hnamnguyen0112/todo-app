@@ -9,3 +9,7 @@ export const CreateTaskSchema = z.object({
   dueDate: z.number().nullable(),
   priority: z.number().int().min(0),
 });
+
+export const DeleteTaskSchema = z.object({
+  columnId: z.string().min(1),
+});

@@ -1,7 +1,7 @@
 "use client";
 
 import reorder from "@/utils/reorder";
-import { useCallback, useState, useTransition } from "react";
+import { startTransition, useCallback, useState, useTransition } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import ProjectColumn from "../column";
 import Droppable from "../droppable";
@@ -11,6 +11,8 @@ import { useParams } from "next/navigation";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import deleteColumn from "@/actions/delete-column";
 import useCreateColumn from "../create-column";
+import { UpdateColumnSchema } from "@/schemas/column";
+import updateColumn from "@/actions/update-column";
 
 interface ProjectBoardProps {
   isCombineEnabled: boolean;
@@ -81,8 +83,31 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
     // reordering column
     if (result.type === "COLUMN") {
       const reorderedorder = reorder(columns, source.index, destination.index);
+      const column = reorderedorder.find(
+        (column) => column.id === result.draggableId,
+      );
 
-      setColumns(reorderedorder);
+      const updateColumnPayload = UpdateColumnSchema.parse({
+        name: column.name,
+        position: destination.index + 1,
+      });
+
+      startTransition(() => {
+        updateColumn({
+          projectId: id as string,
+          columnId: column.id,
+          payload: updateColumnPayload,
+        })
+          .then(() => {
+            setColumns(reorderedorder);
+          })
+          .catch((error) => {
+            toast({
+              type: "error",
+              message: error.message,
+            });
+          });
+      });
 
       return;
     }

@@ -2,13 +2,58 @@ import { Task } from "@/interfaces/task";
 import Draggable from "../draggable";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import deleteTask from "@/actions/delete-task";
+import { useParams } from "next/navigation";
+import { DeleteTaskSchema } from "@/schemas/task";
+import toast from "@/components/toast";
+import { Dispatch, SetStateAction } from "react";
+import { Column } from "@/interfaces/column";
 
 interface TaskProps {
   task: Task;
   index: number;
+  setColumns: Dispatch<SetStateAction<Column[]>>;
 }
 
-const TaskC = ({ task, index }: TaskProps) => {
+const TaskC = ({ task, index, setColumns }: TaskProps) => {
+  const params = useParams();
+  const { id } = params;
+
+  const handleDelete = () => {
+    const payload = DeleteTaskSchema.parse({
+      columnId: task.columnId,
+    });
+    deleteTask({
+      projectId: id as string,
+      taskId: task.id,
+      payload,
+    })
+      .then(() => {
+        toast({
+          type: "success",
+          message: "Task deleted successfully",
+        });
+
+        setColumns((prev) =>
+          prev.map((column) => {
+            if (column.id === task.columnId) {
+              return {
+                ...column,
+                tasks: column.tasks.filter((t) => t.id !== task.id),
+              };
+            }
+            return column;
+          }),
+        );
+      })
+      .catch(() => {
+        toast({
+          type: "error",
+          message: "Failed to delete task",
+        });
+      });
+  };
+
   return (
     <Draggable
       draggableId={task.id}
@@ -63,7 +108,11 @@ const TaskC = ({ task, index }: TaskProps) => {
             <div className="my-1 h-px bg-gray-200" />
 
             <MenuItem>
-              <button className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-gray-50 text-black">
+              <button
+                className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-gray-50 text-black"
+                onClick={handleDelete}
+                type="button"
+              >
                 Delete
               </button>
             </MenuItem>

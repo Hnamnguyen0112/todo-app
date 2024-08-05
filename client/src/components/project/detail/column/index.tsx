@@ -70,7 +70,12 @@ const ProjectColumn = ({
         {column.tasks
           .sort((a, b) => a.position - b.position)
           .map((task: Task, index: number) => (
-            <TaskComponent key={task.id} task={task} index={index} />
+            <TaskComponent
+              key={task.id}
+              task={task}
+              index={index}
+              setColumns={setColumns}
+            />
           ))}
 
         <CreateTask />

@@ -13,5 +13,7 @@ func ProjectRouter(app fiber.Router, handler *handler.Handler) {
 	app.Get("/:id", middlewares.Protected(), handler.GetProjectById)
 	app.Post("/:id/columns", middlewares.Protected(), handler.AddColumnToProject)
 	app.Delete("/:id/columns/:columnId", middlewares.Protected(), handler.DeleteColumnFromProject)
+	app.Patch("/:id/columns/:columnId", middlewares.Protected(), handler.UpdateColumnFromProject)
 	app.Post("/:id/tasks", middlewares.Protected(), handler.AddTaskToProject)
+	app.Delete("/:id/tasks/:taskId", middlewares.Protected(), handler.DeleteTaskFromProject)
 }
