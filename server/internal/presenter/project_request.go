@@ -34,7 +34,7 @@ func (r *CreateProjectRequest) Bind(
 }
 
 type AddColumnToProjectRequest struct {
-	Name     string `json:"name"     validate:"required,min=3,max=50"`
+	Name     string `json:"name"     validate:"required,min=1,max=50"`
 	Position int    `json:"position" validate:"required"`
 }
 
@@ -61,7 +61,7 @@ func (r *AddColumnToProjectRequest) Bind(
 type AddTaskToProjectRequest struct {
 	ColumnID    uuid.UUID `json:"columnId"    validate:"required"`
 	AssigneeID  uuid.UUID `json:"assigneeId"`
-	Title       string    `json:"title"       validate:"required,min=3,max=50"`
+	Title       string    `json:"title"       validate:"required,min=1,max=50"`
 	Description string    `json:"description" validate:"max=2000"`
 	Priority    int       `json:"priority"    validate:"required"`
 	DueDate     int64     `json:"dueDate"     validate:"required"`
@@ -92,6 +92,45 @@ func (r *AddTaskToProjectRequest) Bind(
 	t.Priority = r.Priority
 	t.DueDate = utils.ParseUnixTimestampToTime(r.DueDate)
 	t.Position = r.Position
+
+	return nil
+}
+
+type UpdateColumnRequest struct {
+	Name     string `json:"name"     validate:"required,min=1,max=50"`
+	Position int    `json:"position" validate:"required"`
+}
+
+func (r *UpdateColumnRequest) Bind(
+	c *fiber.Ctx,
+	v *validator.Validate,
+) error {
+	if err := c.BodyParser(r); err != nil {
+		return err
+	}
+
+	if err := v.Struct(r); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type DeleteTaskRequest struct {
+	ColumnID uuid.UUID `json:"columnId" validate:"required"`
+}
+
+func (r *DeleteTaskRequest) Bind(
+	c *fiber.Ctx,
+	v *validator.Validate,
+) error {
+	if err := c.BodyParser(r); err != nil {
+		return err
+	}
+
+	if err := v.Struct(r); err != nil {
+		return err
+	}
 
 	return nil
 }

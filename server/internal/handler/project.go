@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -91,8 +89,6 @@ func (h *Handler) GetProjectById(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
-
-	fmt.Println(p.Columns)
 
 	c.Locals("data", p)
 	return c.SendStatus(fiber.StatusOK)
@@ -219,6 +215,114 @@ func (h *Handler) DeleteColumnFromProject(c *fiber.Ctx) error {
 	}
 
 	if err := h.columnService.DeleteColumnByIdAndProjectId(columnId, p.ID); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func (h *Handler) UpdateColumnFromProject(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userIdString := claims["sub"].(string)
+
+	userId, err := uuid.Parse(userIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	projectIdString := c.Params("id")
+	projectId, err := uuid.Parse(projectIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	columnIdString := c.Params("columnId")
+	columnId, err := uuid.Parse(columnIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	req := &presenter.UpdateColumnRequest{}
+
+	if err := req.Bind(c, h.validator.validator); err != nil {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
+	}
+
+	p, err := h.projectService.GetProjectByIdAndUserId(projectId, userId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	co, err := h.columnService.FindColumnByIdAndProjectId(columnId, p.ID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	if co.Position == req.Position {
+		co.Name = req.Name
+		h.columnService.UpdateColumnById(co.ID, co)
+	} else {
+		exists, err := h.columnService.FindColumnsByProjectIdAndPosition(p.ID, req.Position)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+		}
+
+		if len(exists) > 0 {
+			for _, swco := range exists {
+				swco.Position = co.Position
+				h.columnService.UpdateColumnById(swco.ID, swco)
+			}
+		}
+
+		co.Name = req.Name
+		co.Position = req.Position
+		h.columnService.UpdateColumnById(co.ID, co)
+	}
+
+	c.Locals("data", presenter.UpdateColumnSuccessResponse(co))
+
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func (h *Handler) DeleteTaskFromProject(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userIdString := claims["sub"].(string)
+
+	userId, err := uuid.Parse(userIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	projectIdString := c.Params("id")
+	projectId, err := uuid.Parse(projectIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	taksIdString := c.Params("taskId")
+	taskId, err := uuid.Parse(taksIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	if _, err := h.projectService.GetProjectByIdAndUserId(projectId, userId); err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	req := &presenter.DeleteTaskRequest{}
+
+	if err := req.Bind(c, h.validator.validator); err != nil {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
+	}
+
+	t, err := h.taskService.FindTaskByIdAndColumnId(taskId, req.ColumnID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	if err := h.taskService.DeleteTask(t); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 

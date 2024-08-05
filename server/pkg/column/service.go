@@ -9,9 +9,10 @@ import (
 
 type Service interface {
 	CreateColumnByProjectId(projectId uuid.UUID, c *entities.Column) error
-	FindColumnsByProjectIdAndPosition(projectId uuid.UUID, position int) ([]entities.Column, error)
+	FindColumnsByProjectIdAndPosition(projectId uuid.UUID, position int) ([]*entities.Column, error)
 	FindColumnByIdAndProjectId(id uuid.UUID, projectId uuid.UUID) (*entities.Column, error)
 	DeleteColumnByIdAndProjectId(id uuid.UUID, projectId uuid.UUID) error
+	UpdateColumnById(id uuid.UUID, c *entities.Column) error
 }
 
 type ColumnService struct{}
@@ -50,10 +51,10 @@ func (s *ColumnService) FindColumnByIdAndProjectId(
 func (s *ColumnService) FindColumnsByProjectIdAndPosition(
 	projectId uuid.UUID,
 	position int,
-) ([]entities.Column, error) {
+) ([]*entities.Column, error) {
 	db := database.DB
 
-	var columns []entities.Column
+	var columns []*entities.Column
 
 	if err := db.Where("project_id = ? AND position = ?", projectId, position).Find(&columns).Error; err != nil {
 		return nil, err
@@ -69,6 +70,16 @@ func (s *ColumnService) DeleteColumnByIdAndProjectId(
 	db := database.DB
 
 	if err := db.Where("id = ? AND project_id = ?", id, projectId).Delete(&entities.Column{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *ColumnService) UpdateColumnById(id uuid.UUID, c *entities.Column) error {
+	db := database.DB
+
+	if err := db.Model(&entities.Column{}).Where("id = ?", id).Updates(c).Error; err != nil {
 		return err
 	}
 
