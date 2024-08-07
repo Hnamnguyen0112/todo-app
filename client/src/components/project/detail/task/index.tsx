@@ -3,11 +3,12 @@ import Draggable from "../draggable";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import deleteTask from "@/actions/delete-task";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { DeleteTaskSchema } from "@/schemas/task";
 import toast from "@/components/toast";
 import { Dispatch, SetStateAction } from "react";
 import { Column } from "@/interfaces/column";
+import Link from "next/link";
 
 interface TaskProps {
   task: Task;
@@ -16,6 +17,7 @@ interface TaskProps {
 }
 
 const TaskC = ({ task, index, setColumns }: TaskProps) => {
+  const router = useRouter();
   const params = useParams();
   const { id } = params;
 
@@ -54,6 +56,10 @@ const TaskC = ({ task, index, setColumns }: TaskProps) => {
       });
   };
 
+  const handleRedirectTaskDetail = () => {
+    router.push(`/projects/${id}/tasks/${task.id}`);
+  };
+
   return (
     <Draggable
       draggableId={task.id}
@@ -62,7 +68,12 @@ const TaskC = ({ task, index, setColumns }: TaskProps) => {
       className="py-2 px-4 bg-white rounded-lg shadow-md text-black flex flex-col justify-between gap-y-2"
     >
       <div className="flex justify-between flex-row">
-        <p className="font-semibold my-auto">{task.title}</p>
+        <Link
+          href={`/projects/${id}/tasks/${task.id}`}
+          className="font-semibold my-auto"
+        >
+          {task.title}
+        </Link>
         <Menu>
           <MenuButton className="p-2 bg-white rounded-lg text-black text-left focus:outline-none ">
             <EllipsisHorizontalIcon className="w-5 h-5" />

@@ -35,7 +35,11 @@ const CreateProject = () => {
             message: "Project created successfully",
           });
 
-          router.push(`/projects/${res.data.id}`);
+          router.back();
+
+          setTimeout(() => {
+            router.push(`/projects/${res.data.id}`);
+          }, 0);
         })
         .catch(() => {
           toast({

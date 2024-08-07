@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { Oxygen } from "next/font/google";
 import Providers from "./providers";
 
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
-
-const oxygen = Oxygen({
-  weight: "400",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={oxygen.className}>
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>

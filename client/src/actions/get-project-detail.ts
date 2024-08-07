@@ -4,6 +4,7 @@ import { CommonResponse } from "@/interfaces/common";
 import { Project } from "@/interfaces/project";
 import { auth } from "@/libs/auth";
 import { Env } from "@/libs/env";
+import { notFound } from "next/navigation";
 
 interface GetProjectDetailProps {
   id: string;
@@ -28,7 +29,7 @@ export default async function ProjectDetail({
     });
 
     if (!res.ok) {
-      throw new Error("Failed to get project detail");
+      return notFound();
     }
 
     return res.json();
