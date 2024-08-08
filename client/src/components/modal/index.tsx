@@ -51,7 +51,7 @@ const Modal = ({
               size === "4xl" && "sm:max-w-4xl",
               size === "5xl" && "sm:max-w-5xl",
               size === "6xl" && "sm:max-w-6xl",
-              "my-8 inline-block w-full transform overflow-hidden rounded-2xl border bg-white p-6 text-left align-middle shadow-xl transition-all duration-300 ease-out data-[closed]:scale-95 data-[closed]:opacity-0",
+              "my-8 inline-block w-full transform overflow-hidden rounded border bg-white p-6 text-left align-middle shadow-xl transition-all duration-300 ease-out data-[closed]:scale-95 data-[closed]:opacity-0",
             )}
           >
             {children}

@@ -9,6 +9,7 @@ import (
 
 type Task struct {
 	ID          uuid.UUID      `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
+	ProjectID   uuid.UUID      `gorm:"type:uuid;not null;"                  json:"projectId"`
 	ColumnID    uuid.UUID      `gorm:"type:uuid;not null;"                  json:"columnId"`
 	AssigneeID  *uuid.UUID     `gorm:"type:uuid"                            json:"assigneeId"`
 	Title       string         `gorm:"not null;size:50;"                    json:"title"       validate:"required,min=1,max=50"`

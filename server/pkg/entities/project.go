@@ -15,5 +15,6 @@ type Project struct {
 	UpdatedAt   time.Time      `                                            json:"updatedAt"`
 	DeletedAt   gorm.DeletedAt `gorm:"index"                                json:"deletedAt"`
 	Invitations []Invitation   `gorm:"foreignKey:ProjectID"                 json:"invitations"`
+	Tasks       []Task         `gorm:"foreignKey:ProjectID"                 json:"tasks"`
 	Columns     []Column       `gorm:"foreignKey:ProjectID"                 json:"columns"`
 }

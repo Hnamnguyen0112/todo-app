@@ -11,6 +11,7 @@ type Service interface {
 	CreateTask(t *entities.Task) error
 	FindTasksByColumnIdAndPosition(columnId uuid.UUID, position int) ([]entities.Task, error)
 	FindTaskByIdAndColumnId(id uuid.UUID, columnId uuid.UUID) (*entities.Task, error)
+	FindTaskByIdAndProjectId(id uuid.UUID, projectId uuid.UUID) (*entities.Task, error)
 	DeleteTask(t *entities.Task) error
 }
 
@@ -68,4 +69,19 @@ func (s *TaskService) DeleteTask(t *entities.Task) error {
 	}
 
 	return nil
+}
+
+func (s *TaskService) FindTaskByIdAndProjectId(
+	id uuid.UUID,
+	projectId uuid.UUID,
+) (*entities.Task, error) {
+	db := database.DB
+
+	var task entities.Task
+
+	if err := db.Where("id = ? AND project_id = ?", id, projectId).First(&task).Error; err != nil {
+		return nil, err
+	}
+
+	return &task, nil
 }

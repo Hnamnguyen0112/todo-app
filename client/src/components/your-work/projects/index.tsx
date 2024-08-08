@@ -8,6 +8,7 @@ import {
   DEFAULT_PAGINATION_PAGE,
 } from "@/utils/constants";
 import { Pagination } from "@nextui-org/react";
+import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -52,7 +53,12 @@ const YourWorkProjects = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-8 mt-6 sm:grid-cols-2 xl:grid-cols-5 lg:grid-cols-4 xl:h-80">
+      <div
+        className={clsx(
+          projects.length !== 0 && "xlh-80",
+          "grid grid-cols-1 gap-8 mt-6 sm:grid-cols-2 xl:grid-cols-5 lg:grid-cols-4",
+        )}
+      >
         {projects.map((project) => (
           <div
             key={project.id}
@@ -72,16 +78,18 @@ const YourWorkProjects = () => {
           </div>
         ))}
       </div>
-      <div className="flex justify-end mt-6">
-        <Pagination
-          isCompact
-          showControls
-          total={meta.totalPages}
-          initialPage={DEFAULT_PAGINATION_PAGE}
-          page={page}
-          onChange={(page) => setPage(page)}
-        />
-      </div>
+      {projects.length > 0 && (
+        <div className="flex justify-end mt-6">
+          <Pagination
+            isCompact
+            showControls
+            total={meta.totalPages}
+            initialPage={DEFAULT_PAGINATION_PAGE}
+            page={page}
+            onChange={(page) => setPage(page)}
+          />
+        </div>
+      )}
     </>
   );
 };

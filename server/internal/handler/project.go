@@ -163,6 +163,8 @@ func (h *Handler) AddTaskToProject(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
 	}
 
+	t.ProjectID = projectId
+
 	p, err := h.projectService.GetProjectByIdAndUserId(projectId, userId)
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
@@ -285,7 +287,7 @@ func (h *Handler) UpdateColumnFromProject(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusOK)
 }
 
-func (h *Handler) DeleteTaskFromProject(c *fiber.Ctx) error {
+func (h *Handler) DeleteTaskById(c *fiber.Ctx) error {
 	user := c.Locals("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	userIdString := claims["sub"].(string)
@@ -326,5 +328,40 @@ func (h *Handler) DeleteTaskFromProject(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func (h *Handler) GetTaskById(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userIdString := claims["sub"].(string)
+
+	userId, err := uuid.Parse(userIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	projectIdString := c.Params("id")
+	projectId, err := uuid.Parse(projectIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	taskIdString := c.Params("taskId")
+	taskId, err := uuid.Parse(taskIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	if _, err := h.projectService.GetProjectByIdAndUserId(projectId, userId); err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	t, err := h.taskService.FindTaskByIdAndProjectId(taskId, projectId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	c.Locals("data", t)
 	return c.SendStatus(fiber.StatusOK)
 }
