@@ -134,3 +134,65 @@ func (r *DeleteTaskRequest) Bind(
 
 	return nil
 }
+
+type UpdateTaskRequest struct {
+	ColumnID    uuid.UUID `json:"columnId"    validate:"required"`
+	AssigneeID  uuid.UUID `json:"assigneeId"`
+	Title       string    `json:"title"       validate:"required,min=1,max=50"`
+	Description string    `json:"description" validate:"max=2000"`
+	Priority    int       `json:"priority"    validate:"required"`
+	DueDate     int64     `json:"dueDate"     validate:"required"`
+}
+
+func (r *UpdateTaskRequest) Bind(
+	c *fiber.Ctx,
+	t *entities.Task,
+	v *validator.Validate,
+) error {
+	v.RegisterCustomTypeFunc(utils.ValidateUUID, uuid.UUID{})
+
+	if err := c.BodyParser(r); err != nil {
+		return err
+	}
+
+	if err := v.Struct(r); err != nil {
+		return err
+	}
+
+	t.ColumnID = r.ColumnID
+	if r.AssigneeID != uuid.Nil {
+		t.AssigneeID = &r.AssigneeID
+	}
+	t.Title = r.Title
+	t.Description = r.Description
+	t.Priority = r.Priority
+	t.DueDate = utils.ParseUnixTimestampToTime(r.DueDate)
+
+	return nil
+}
+
+type ChangeTaskStatusRequest struct {
+	ColumnID uuid.UUID `json:"columnId" validate:"required"`
+	Position int       `json:"position" validate:"required"`
+}
+
+func (r *ChangeTaskStatusRequest) Bind(
+	c *fiber.Ctx,
+	t *entities.Task,
+	v *validator.Validate,
+) error {
+	v.RegisterCustomTypeFunc(utils.ValidateUUID, uuid.UUID{})
+
+	if err := c.BodyParser(r); err != nil {
+		return err
+	}
+
+	if err := v.Struct(r); err != nil {
+		return err
+	}
+
+	t.ColumnID = r.ColumnID
+	t.Position = r.Position
+
+	return nil
+}

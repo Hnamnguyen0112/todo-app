@@ -130,7 +130,9 @@ const TaskC = ({ task, index, setColumns }: TaskProps) => {
           </MenuItems>
         </Menu>
       </div>
-      <p className="line-clamp-2 text-sm text-gray-700">{task.description}</p>
+      <p className="line-clamp-3 text-sm text-gray-700 max-w-[272px]">
+        {task.description}
+      </p>
     </Draggable>
   );
 };
