@@ -13,6 +13,7 @@ type Service interface {
 	FindTaskByIdAndColumnId(id uuid.UUID, columnId uuid.UUID) (*entities.Task, error)
 	FindTaskByIdAndProjectId(id uuid.UUID, projectId uuid.UUID) (*entities.Task, error)
 	DeleteTask(t *entities.Task) error
+	UpdateTaskById(t *entities.Task) error
 }
 
 type TaskService struct{}
@@ -25,6 +26,16 @@ func (s *TaskService) CreateTask(t *entities.Task) error {
 	db := database.DB
 
 	if err := db.Create(t).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *TaskService) UpdateTaskById(t *entities.Task) error {
+	db := database.DB
+
+	if err := db.Save(t).Error; err != nil {
 		return err
 	}
 

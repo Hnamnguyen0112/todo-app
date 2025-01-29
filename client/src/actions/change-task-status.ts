@@ -2,15 +2,15 @@
 
 import { auth } from "@/libs/auth";
 import { Env } from "@/libs/env";
-import { UpdateTaskSchema } from "@/schemas/task";
+import { ChangeTaskStatusSchema } from "@/schemas/task";
 import { z } from "zod";
 
 interface UpdateTaskProps {
   projectId: string;
   taskId: string;
-  payload: z.infer<typeof UpdateTaskSchema>;
+  payload: z.infer<typeof ChangeTaskStatusSchema>;
 }
-export default async function updateTask({
+export default async function changeTaskStatus({
   projectId,
   taskId,
   payload,
@@ -19,13 +19,13 @@ export default async function updateTask({
   if (!session) {
     throw new Error("Unauthorized");
   }
-  const validatedFields = UpdateTaskSchema.safeParse(payload);
+  const validatedFields = ChangeTaskStatusSchema.safeParse(payload);
   if (!validatedFields.success) {
     throw new Error("Invalid fields");
   }
   try {
     const res = await fetch(
-      `${Env.BACKEND_URL}/api/v1/projects/${projectId}/tasks/${taskId}`,
+      `${Env.BACKEND_URL}/api/v1/projects/${projectId}/tasks/${taskId}/status`,
       {
         method: "PATCH",
         headers: {

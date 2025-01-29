@@ -365,3 +365,93 @@ func (h *Handler) GetTaskById(c *fiber.Ctx) error {
 	c.Locals("data", t)
 	return c.SendStatus(fiber.StatusOK)
 }
+
+func (h *Handler) UpdateTaskById(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userIdString := claims["sub"].(string)
+
+	userId, err := uuid.Parse(userIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	projectIdString := c.Params("id")
+	projectId, err := uuid.Parse(projectIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	taskIdString := c.Params("taskId")
+	taskId, err := uuid.Parse(taskIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	if _, err := h.projectService.GetProjectByIdAndUserId(projectId, userId); err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	t, err := h.taskService.FindTaskByIdAndProjectId(taskId, projectId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	req := &presenter.UpdateTaskRequest{}
+
+	if err := req.Bind(c, t, h.validator.validator); err != nil {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
+	}
+
+	if err := h.taskService.UpdateTaskById(t); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	c.Locals("data", t)
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func (h *Handler) ChangeTaskStatus(c *fiber.Ctx) error {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userIdString := claims["sub"].(string)
+
+	userId, err := uuid.Parse(userIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	projectIdString := c.Params("id")
+	projectId, err := uuid.Parse(projectIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	taskIdString := c.Params("taskId")
+	taskId, err := uuid.Parse(taskIdString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	if _, err := h.projectService.GetProjectByIdAndUserId(projectId, userId); err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	t, err := h.taskService.FindTaskByIdAndProjectId(taskId, projectId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
+	}
+
+	req := &presenter.ChangeTaskStatusRequest{}
+
+	if err := req.Bind(c, t, h.validator.validator); err != nil {
+		return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
+	}
+
+	if err := h.taskService.UpdateTaskById(t); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	c.Locals("data", t)
+	return c.SendStatus(fiber.StatusOK)
+}

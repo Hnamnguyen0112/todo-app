@@ -2,6 +2,7 @@ package column
 
 import (
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"github.com/Hnamnguyen0112/todo-app/server/internal/database"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/entities"
@@ -69,7 +70,19 @@ func (s *ColumnService) DeleteColumnByIdAndProjectId(
 ) error {
 	db := database.DB
 
+	var deletedColumn entities.Column
+	if err := db.Where("id = ? AND project_id = ?", id, projectId).First(&deletedColumn).Error; err != nil {
+		return err // Return if column not found
+	}
+
+	// Delete the column
 	if err := db.Where("id = ? AND project_id = ?", id, projectId).Delete(&entities.Column{}).Error; err != nil {
+		return err
+	}
+
+	if err := db.Model(&entities.Column{}).
+		Where("project_id = ? AND position > ?", projectId, deletedColumn.Position).
+		Update("position", gorm.Expr("position - 1")).Error; err != nil {
 		return err
 	}
 

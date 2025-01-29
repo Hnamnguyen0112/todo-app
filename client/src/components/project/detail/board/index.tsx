@@ -13,6 +13,8 @@ import deleteColumn from "@/actions/delete-column";
 import useCreateColumn from "../create-column";
 import { UpdateColumnSchema } from "@/schemas/column";
 import updateColumn from "@/actions/update-column";
+import { ChangeTaskStatusSchema } from "@/schemas/task";
+import changeTaskStatus from "@/actions/change-task-status";
 
 interface ProjectBoardProps {
   isCombineEnabled: boolean;
@@ -118,25 +120,43 @@ const ProjectBoard = ({ isCombineEnabled, initial }: ProjectBoardProps) => {
         return;
       }
 
-      setColumns((prev) => {
-        const newColumns = [...prev];
-        const newColumn = { ...column };
-        const [removed] = newColumn.tasks.splice(source.index, 1);
+      const updateTaskPayload = ChangeTaskStatusSchema.parse({
+        columnId: destination.droppableId,
+        position: destination.index + 1,
+      });
 
-        newColumns.find((col) => col.id === newColumn.id)!.tasks =
-          newColumn.tasks;
+      startTransition(() => {
+        changeTaskStatus({
+          projectId: id as string,
+          taskId: result.draggableId,
+          payload: updateTaskPayload,
+        })
+          .then(() => {
+            const newColumns = [...columns];
+            const newColumn = { ...column };
+            const [removed] = newColumn.tasks.splice(source.index, 1);
 
-        const targetColumn = newColumns.find(
-          (col) => col.id === destination.droppableId,
-        );
+            newColumns.find((col) => col.id === newColumn.id)!.tasks =
+              newColumn.tasks;
 
-        if (!targetColumn) {
-          return newColumns;
-        }
+            const targetColumn = newColumns.find(
+              (col) => col.id === destination.droppableId,
+            );
 
-        targetColumn.tasks.splice(destination.index, 0, removed);
+            if (!targetColumn) {
+              return;
+            }
 
-        return newColumns;
+            targetColumn.tasks.splice(destination.index, 0, removed);
+
+            setColumns(newColumns);
+          })
+          .catch((error) => {
+            toast({
+              type: "error",
+              message: error.message,
+            });
+          });
       });
 
       return;
