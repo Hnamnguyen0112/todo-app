@@ -21,6 +21,7 @@ import (
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/column"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/invitation"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/middlewares"
+	"github.com/Hnamnguyen0112/todo-app/server/pkg/notification"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/project"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/task"
 	"github.com/Hnamnguyen0112/todo-app/server/pkg/token"
@@ -41,6 +42,7 @@ func main() {
 	is := invitation.NewService()
 	cs := column.NewService()
 	tks := task.NewService()
+	n := notification.NewService()
 
 	app := fiber.New(fiber.Config{
 		ReadBufferSize: 4096 * 2,
@@ -59,21 +61,25 @@ func main() {
 	}))
 
 	app.Use(middlewares.ResponseFormatterMiddleware)
+	app.Use(middlewares.WebsocketMiddleware)
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
 	h := handler.NewHandler(handler.HandlerParams{
-		UserService:       us,
-		TokenService:      ts,
-		ProjectService:    ps,
-		InvitationService: is,
-		ColumnService:     cs,
-		TaskService:       tks,
+		UserService:         us,
+		TokenService:        ts,
+		ProjectService:      ps,
+		InvitationService:   is,
+		ColumnService:       cs,
+		TaskService:         tks,
+		NotificationService: n,
 	})
 
 	routes.AuthRouter(v1.Group("/auth"), h)
 	routes.ProjectRouter(v1.Group("/projects"), h)
+	routes.NotificationRouter(v1.Group("/notifications"), h)
+	routes.WsRouter(v1.Group("/ws"), h)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)

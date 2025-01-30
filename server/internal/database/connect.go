@@ -66,6 +66,7 @@ func Connect() {
 		&entities.Invitation{},
 		&entities.Column{},
 		&entities.Task{},
+		&entities.Notification{},
 	)
 }
 
